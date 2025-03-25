@@ -1,0 +1,46 @@
+{
+    "folders": [
+        {
+            "path": ".",
+        },
+        {
+            "name": "ZephyrAPIs",
+            "path": "../zephyr/include",
+        },
+    ],
+    "settings": {
+        "cmake.buildArgs": [
+            "-Cbuild"
+        ],
+        "cmake.configureArgs": [
+            "-Bbuild -GNinja -DBOARD=esp32devkitc_wroom/esp32/procpu app"
+        ],
+        "cmake.buildDirectory": "${workspaceFolder}/build",
+        "cmake.generator": "Ninja",
+        "cmake.configureOnOpen": false,
+        "cmake.buildBeforeRun": true,
+        "cmake.preBuildCommand": "source ./../bin/activate",
+        "files.associations": {
+            "blink.h": "c",
+            "cstddef": "cpp",
+            "limits": "cpp"
+        },
+        "cmake.additionalCompilerSearchDirs": [
+            "home/osama/projects/esp/home_automation/zephyrproject/zephyr/include/"
+        ],
+        /* C/C++ extension settings */
+        "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+        "C_Cpp.default.includePath": [
+            "${workspaceFolder}/**",
+            "/home/osama/projects/esp/home_automation/zephyrproject/zephyr/include"
+        ],
+        "C_Cpp.default.defines": [],
+        "C_Cpp.default.compilerPath": "/usr/bin/gcc",
+        "C_Cpp.default.cStandard": "c17",
+        "C_Cpp.default.cppStandard": "gnu++17",
+        "C_Cpp.default.intelliSenseMode": "linux-gcc-x64",
+        "C_Cpp.default.compileCommands": [
+            "${workspaceFolder}/build/compile_commands.json",
+        ]
+    },
+}
