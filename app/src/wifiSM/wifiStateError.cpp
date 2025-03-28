@@ -13,7 +13,8 @@ void wifiStateError::enter(wifiContext& ctx, net_if* iface)
 
 void wifiStateError::handle(wifiContext& ctx, wifi_iface_status status)
 {
-    MYLOG("⚠️ Handling error... staying here");
+    MYLOG("⚠️ Handling error... Going to IDLE ");
+    ctx.setState(static_cast<wifiState*>(idle));
     // Optionally retry or escalate
 }
 
