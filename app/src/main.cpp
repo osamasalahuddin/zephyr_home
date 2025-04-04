@@ -61,6 +61,12 @@ int main(void)
         {
             /* Do WiFI Stuff after this */
             isConnectRequested = false;
+            /* Reset the time and check after every minute */
+            if ((k_uptime_get() - start > 60000))
+            {
+                MYLOG("✅ Wifi still Connected");
+                start = k_uptime_get();
+            }
         }
         else if (wifiStateEnum::ERROR == state)
         {
