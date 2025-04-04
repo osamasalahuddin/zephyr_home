@@ -30,6 +30,9 @@ project(app)
 # Main
 target_sources(app PRIVATE src/main.cpp)
 
+# Ping Manager
+target_sources(app PRIVATE src/pingManager/pingManager.cpp)
+
 # Socket Manager
 target_sources(app PRIVATE src/socketManager/socketManager.cpp)
 # Socket Strategy
@@ -53,6 +56,9 @@ target_sources(app PRIVATE src/wifiSM/wifiStateIdle.cpp)
 # zephyr_syscall_include_directories(./../include/app/drivers/)
 # zephyr_include_directories(./../include)
 # zephyr_include_directories(./../include/app/drivers/)
+
+# Ping Manager
+target_include_directories(app PRIVATE src/pingManager)
 
 # Socket Manager
 target_include_directories(app PRIVATE src/socketManager)

@@ -79,9 +79,11 @@ class wifiStateError : public wifiState
 {
 private:
     wifiStateIdle* idle;
+    wifiStateDisconnected* disconnected;
 
 public:
-    wifiStateError(wifiStateIdle* idleState);
+    wifiStateError(wifiStateIdle* idleState,
+                   wifiStateDisconnected* disconnectedState);
     void enter(wifiContext& ctx, net_if* iface) override;
     void handle(wifiContext& ctx, wifi_iface_status status) override;
     int name(void) const override;

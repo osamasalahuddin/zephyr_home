@@ -111,10 +111,10 @@ void wifiManager::init()
     disconnected = new wifiStateDisconnected(idle);
     connected = new wifiStateConnected(disconnected);
     connecting = new wifiStateConnecting(connected);
-    error = new wifiStateError(idle);
 
     /* Connect the loop back */
     *idle = wifiStateIdle(connecting);
+    error = new wifiStateError(idle, disconnected);
 
     /* Get the WiFi Interface */
     // for (struct net_if* it = net_if_get_first(); it != NULL; it = net_if_get_next(it))
@@ -209,13 +209,12 @@ void wifiManager::disconnect()
     if (ret)
     {
         MYLOG("WiFi Disconnection Request Failed");
-        state = ERROR;
         context->setState(static_cast<wifiState*>(error));
     }
     else
     {
         connected->setDisconnectCalled(true);
-        state = DISCONNECTED;
+        context->setState(static_cast<wifiState*>(disconnected));
     }
 }
 
