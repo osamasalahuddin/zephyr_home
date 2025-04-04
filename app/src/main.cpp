@@ -14,11 +14,15 @@ LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
 #include <zephyr/net/wifi_mgmt.h>
 #include <zephyr/net/net_event.h>
 
+/* For Ping */
+#include <zephyr/net/socket.h>
+#include <zephyr/net/icmp.h>
+
 #include "myLogger.h"
 #include "handlers.h"
 #include "wifi.h"
 #include "wifiManager.hpp"
-
+#include "pingManager.hpp"
 
 wifiManager wifi;
 
@@ -38,6 +42,10 @@ int main(void)
     bool isConnectRequested = false;
     wifiStateEnum state;
 
+    pingManager& ping = pingManager::instance();
+
+    ping.init();
+
     while (true)
     {
         wifi.tick();
@@ -56,15 +64,31 @@ int main(void)
         else if (wifiStateEnum::CONNECTING == state)
         {
             /* Wait for Connection to be established */
+            if (k_uptime_get() - start > 60000)
+            {
+                MYLOG("❌ Failed to connect to Wifi");
+                /* Disconnect from Wifi */
+                wifi.disconnect();
+
+                /* Get New start of time for reconnection */
+                start = k_uptime_get();
+            }
         }
         else if (wifiStateEnum::CONNECTED == state)
         {
-            /* Do WiFI Stuff after this */
+            /* Do WiFi Stuff after this */
             isConnectRequested = false;
             /* Reset the time and check after every minute */
             if ((k_uptime_get() - start > 60000))
             {
                 MYLOG("✅ Wifi still Connected");
+
+                /* Send ping to Remote Server */
+                ping.send_ping("8.8.8.8");
+
+                /* Send Ping to the Local server */
+                ping.send_ping("192.168.0.223");
+
                 start = k_uptime_get();
             }
         }
@@ -74,6 +98,19 @@ int main(void)
             {
                 MYLOG("❌ Error in Wifi Initialization. ReInitializing");
                 wifi.connect();
+                start = k_uptime_get();
+            }
+        }
+        else if (wifiStateEnum::DISCONNECTED == state)
+        {
+            /* Connect after 10 seconds */
+            if (k_uptime_get() - start > 10000)
+            {
+                MYLOG("❌ Wifi Reconnecting");
+                wifi.connect();
+
+                /* Get New start of time for reconnection */
+                start = k_uptime_get();
             }
         }
     }
