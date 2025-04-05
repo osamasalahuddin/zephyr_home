@@ -62,4 +62,5 @@ public:
     wifiStateEnum wifi_status();
     wifiStateEnum getWifiState();
     wifi_iface_status get_wifi_status(struct net_if *iface);
+    struct net_if * get_wifi_iface();
 };

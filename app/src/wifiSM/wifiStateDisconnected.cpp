@@ -14,9 +14,9 @@ void wifiStateDisconnected::enter(wifiContext& ctx, net_if* iface)
 
 void wifiStateDisconnected::handle(wifiContext& ctx, wifi_iface_status status)
 {
-    MYLOG("🔄 Trying to recover or restart connection");
+    // MYLOG("🔄 Trying to recover or restart connection");
     bool recoveryComplete = false; // Replace with real logic
-    if (recoveryComplete)
+    if (isConnectCalled)
     {
         ctx.setState(static_cast<wifiState*>(idle));
     }
@@ -30,7 +30,7 @@ void wifiStateDisconnected::handle(wifiContext& ctx, wifi_iface_status status)
 
 int wifiStateDisconnected::name() const
 {
-    return static_cast<int>(CONNECTED);
+    return static_cast<int>(DISCONNECTED);
 }
 
 void wifiStateDisconnected::setConnectCalled(bool value)
