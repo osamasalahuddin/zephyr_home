@@ -18,8 +18,14 @@ pingManager& pingManager::instance()
 
 void pingManager::init()
 {
-    net_icmp_init_ctx(&icmp_ctx, NET_ICMPV4_ECHO_REPLY, 0, handle_reply);
-    MYLOG("Ping manager initialized");
+    if (0 != net_icmp_init_ctx(&icmp_ctx, NET_ICMPV4_ECHO_REPLY, 0, handle_reply))
+    {
+        MYLOG("❌ PingManager initialization failed");
+    }
+    else
+    {
+        MYLOG(" ✅ PingManager initialized");
+    }
 }
 
 void pingManager::send_ping(const char* ip, struct net_if *iface)
@@ -33,12 +39,19 @@ void pingManager::send_ping(const char* ip, struct net_if *iface)
     }
     else
     {
+        int ret = inet_pton(AF_INET, ip, &dst.sin_addr);
+
+        if (ret <= 0)
+        {
+            MYLOG("❌ Invalid IP address: %s", ip);
+            return;
+        }
+
         dst.sin_family = AF_INET;
         dst.sin_port = 0;
-        inet_pton(AF_INET, ip, &dst.sin_addr);
 
         // struct net_if* iface = net_if_get_default();
-        int ret = net_icmp_send_echo_request(&icmp_ctx, iface, (struct sockaddr*)&dst, &params, nullptr);
+        ret = net_icmp_send_echo_request(&icmp_ctx, iface, (struct sockaddr*)&dst, &params, nullptr);
         if (ret == 0)
         {
             MYLOG("✅ Ping sent to %s", ip);
@@ -49,6 +62,26 @@ void pingManager::send_ping(const char* ip, struct net_if *iface)
         }
     }
 
+}
+
+void pingManager::tick()
+{
+    int64_t current_time = k_uptime_get();
+
+    // Iterate through pending requests and check for timeouts
+    auto it = pending_requests.begin();
+    while (it != pending_requests.end())
+    {
+        if (current_time - it->start_time > PING_TIMEOUT_MS)
+        {
+            MYLOG("❌ Ping to %s timed out", it->ip.c_str());
+            it = pending_requests.erase(it); // Remove the timed-out request
+        }
+        else
+        {
+            ++it; // Move to the next request
+        }
+    }
 }
 
 void pingManager::cleanup()
