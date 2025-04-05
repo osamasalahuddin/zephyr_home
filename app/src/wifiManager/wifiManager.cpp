@@ -189,7 +189,7 @@ void wifiManager::tick()
 
 void wifiManager::connect()
 {
-    if (!isError)
+    if (!isError || (DISCONNECTED == state))
     {
         MYLOG("🔗 Connecting to Wi-Fi");
         idle->setConnectingCalled(true);
@@ -243,6 +243,11 @@ wifi_iface_status wifiManager::get_wifi_status(struct net_if* iface)
     }
 
     return status;
+}
+
+struct net_if * wifiManager::get_wifi_iface()
+{
+    return iface;
 }
 
 wifiStateEnum wifiManager::getWifiState()
