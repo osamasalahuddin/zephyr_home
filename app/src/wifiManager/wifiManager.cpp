@@ -189,10 +189,16 @@ void wifiManager::tick()
 
 void wifiManager::connect()
 {
-    if (!isError || (DISCONNECTED == state))
+    if (!isError && (IDLE == state))
     {
         MYLOG("🔗 Connecting to Wi-Fi");
         idle->setConnectingCalled(true);
+    }
+    else if (DISCONNECTED == state)
+    {
+        /* If it was in Disconnect then trigger it from Disconnect State. */
+        MYLOG("🔗 Connecting to Wi-Fi Again after disconnect");
+        context->setState(static_cast<wifiState*>(connecting));
     }
     else
     {
