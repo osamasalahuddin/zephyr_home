@@ -17,7 +17,7 @@ void wifiStateError::enter(wifiContext& ctx, net_if* iface)
 
 void wifiStateError::handle(wifiContext& ctx, wifi_iface_status status)
 {
-    MYLOG("⚠️ Handling error... Going to IDLE ");
+    MYLOG("⚠️ Handling error... Going to Disconnected state");
     ctx.setState(static_cast<wifiState*>(this->disconnected));
     // Optionally retry or escalate
 }
