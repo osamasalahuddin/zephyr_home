@@ -32,14 +32,16 @@ int main(void)
     MYLOG("Hello World!");
 
     /* Prechecks for Connecting with Wifi */
-    struct wifi_iface_status status = {0};
+    // struct wifi_iface_status status = {0};
 
     wifi.init();
 
     wifi.tick();
     int64_t start = k_uptime_get();
+    uint8_t ticks = 0;
 
     bool isConnectRequested = false;
+    bool isNewConnect = false;
     wifiStateEnum state;
 
     pingManager& ping = pingManager::instance();
@@ -59,6 +61,7 @@ int main(void)
                 MYLOG("Waiting for Wifi to connect");
                 wifi.connect();
                 isConnectRequested = true;
+                isNewConnect = true;
             }
         }
         else if (wifiStateEnum::CONNECTING == state)
@@ -78,18 +81,31 @@ int main(void)
         {
             /* Do WiFi Stuff after this */
             isConnectRequested = false;
-            /* Reset the time and check after every minute */
-            if ((k_uptime_get() - start > 60000))
-            {
-                MYLOG("✅ Wifi still Connected");
 
+            if (true == isNewConnect)
+            {
+                start = k_uptime_get();
+                isNewConnect = false;
+            }
+
+            /* Reset the time and check after every 10 seconds */
+            if ((k_uptime_get() - start > 10000) && !isNewConnect)
+            {
                 /* Send ping to Remote Server */
-                ping.send_ping("8.8.8.8");
+                ping.send_ping("8.8.8.8", wifi.get_wifi_iface());
 
                 /* Send Ping to the Local server */
-                ping.send_ping("192.168.0.223");
+                ping.send_ping("192.168.0.223", wifi.get_wifi_iface());
 
                 start = k_uptime_get();
+
+                ticks++;
+
+                if (ticks == 6)
+                {
+                    MYLOG("✅ Wifi still Connected");
+                    ticks = 0;
+                }
             }
         }
         else if (wifiStateEnum::ERROR == state)
