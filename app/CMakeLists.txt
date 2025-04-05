@@ -27,18 +27,29 @@ project(app)
 
 #-------------------------------------------
 # Source Files
+# Main
 target_sources(app PRIVATE src/main.cpp)
-target_sources(app PRIVATE src/handlers.cpp)
-target_sources(app PRIVATE src/wifi.cpp)
+
+# Ping Manager
+target_sources(app PRIVATE src/pingManager/pingManager.cpp)
+
+# Socket Manager
+target_sources(app PRIVATE src/socketManager/socketManager.cpp)
+# Socket Strategy
+target_sources(app PRIVATE src/socketStrategy/socketStrategy.cpp)
+
+# Manager Factory
+target_sources(app PRIVATE src/managerFactory/managerFactory.cpp)
+# Wifi Manager
+target_sources(app PRIVATE src/wifiManager/wifiManager.cpp)
+target_sources(app PRIVATE src/wifiManager/wifiManagerHandlers.cpp)
 # Wifi State Machine
 target_sources(app PRIVATE src/wifiSM/wifiContext.cpp)
 target_sources(app PRIVATE src/wifiSM/wifiStateConnected.cpp)
 target_sources(app PRIVATE src/wifiSM/wifiStateConnecting.cpp)
 target_sources(app PRIVATE src/wifiSM/wifiStateDisconnected.cpp)
+target_sources(app PRIVATE src/wifiSM/wifiStateError.cpp)
 target_sources(app PRIVATE src/wifiSM/wifiStateIdle.cpp)
-
-# target_sources(app PRIVATE src/my_syscall.c)
-# target_sources(app PRIVATE ../drivers/blink/gpio_led.c)
 
 #-------------------------------------------
 # Include Directories
@@ -46,6 +57,16 @@ target_sources(app PRIVATE src/wifiSM/wifiStateIdle.cpp)
 # zephyr_include_directories(./../include)
 # zephyr_include_directories(./../include/app/drivers/)
 
+# Ping Manager
+target_include_directories(app PRIVATE src/pingManager)
+
+# Socket Manager
+target_include_directories(app PRIVATE src/socketManager)
+target_include_directories(app PRIVATE src/socketStrategy)
+
+# Wifi Manager
+target_include_directories(app PRIVATE src/managerFactory)
+target_include_directories(app PRIVATE src/wifiManager)
 target_include_directories(app PRIVATE src/wifiSM)
 
 target_include_directories(app PRIVATE ./../include/)
@@ -67,4 +88,11 @@ target_link_libraries(app PRIVATE zephyr_interface)
 target_compile_definitions(app PRIVATE
     WIFI_SSID="$ENV{WIFI_SSID}"
     WIFI_PASSWORD="$ENV{WIFI_PASSWORD}"
+)
+
+#-------------------------------------------
+# GraphViz
+add_custom_target(graphviz
+    COMMAND ${CMAKE_COMMAND} "--graphviz=dependencyGraph.dot" .
+    WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
 )

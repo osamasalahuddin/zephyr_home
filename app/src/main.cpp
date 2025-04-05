@@ -14,172 +14,122 @@ LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
 #include <zephyr/net/wifi_mgmt.h>
 #include <zephyr/net/net_event.h>
 
-#include "wifiContext.hpp"
-#include "wifiStateImp.hpp"
+/* For Ping */
+#include <zephyr/net/socket.h>
+#include <zephyr/net/icmp.h>
 
 #include "myLogger.h"
 #include "handlers.h"
 #include "wifi.h"
+#include "wifiManager.hpp"
+#include "pingManager.hpp"
 
-static struct net_mgmt_event_callback wifi_cb;
-static struct net_mgmt_event_callback ipv4_cb;
-
-void register_wifi_events()
-{
-    net_mgmt_init_event_callback(&wifi_cb, wifi_mgmt_event_handler,
-                                    NET_EVENT_WIFI_CONNECT_RESULT |
-                                    NET_EVENT_WIFI_DISCONNECT_RESULT |
-                                    NET_EVENT_WIFI_SCAN_RESULT );
-
-    net_mgmt_init_event_callback(&ipv4_cb, ipv4_mgmt_event_handler, NET_EVENT_IPV4_ADDR_ADD);
-
-    net_mgmt_add_event_callback(&wifi_cb);
-    net_mgmt_add_event_callback(&ipv4_cb);
-}
-
-static void ip_addr_callback(struct net_if *iface, struct net_if_addr *addr, void *user_data)
-{
-    char ip_str[NET_IPV4_ADDR_LEN];
-
-    if (addr->addr_type == NET_ADDR_DHCP || addr->addr_type == NET_ADDR_MANUAL) {
-        net_addr_ntop(AF_INET, &addr->address.in_addr, ip_str, sizeof(ip_str));
-        printk("Assigned IPv4 address: %s\n", ip_str);
-    }
-}
-
-void check_ipv4_address(void)
-{
-    struct net_if *iface = net_if_get_default();
-
-    if (!iface)
-    {
-        printk("No default network interface found.\n");
-        return;
-    }
-
-    net_if_ipv4_addr_foreach(iface, ip_addr_callback, NULL);
-}
+wifiManager wifi;
 
 int main(void)
 {
-    register_wifi_events();
-
-    struct net_if *iface = net_if_get_default();
-
     /* Main Function */
-    MYLOG("Hello World!\n");
-
-    if (iface)
-    {
-        net_if_up(iface);
-        MYLOG("Network interface found!");
-    }
-    else
-    {
-        LOG_ERR("No network interface found!\n");
-    }
+    MYLOG("Hello World!");
 
     /* Prechecks for Connecting with Wifi */
-    struct wifi_iface_status status = {0};
+    // struct wifi_iface_status status = {0};
 
-    status = get_wifi_status(iface);
+    wifi.init();
 
-    if (status.state == WIFI_STATE_INACTIVE || status.state == WIFI_STATE_DISCONNECTED)
-    {
-        MYLOG("WiFi is Inactive or Disconnected");
-    }
-    else
-    {
-        while (status.state != WIFI_STATE_COMPLETED)
-        {
-            if ((status.state == WIFI_STATE_INACTIVE) || (status.state == WIFI_STATE_DISCONNECTED))
-            {
-                break;
-            }
+    wifi.tick();
+    int64_t start = k_uptime_get();
+    uint8_t ticks = 0;
 
-            status = get_wifi_status(iface);
-        }
-    }
+    bool isConnectRequested = false;
+    bool isNewConnect = false;
+    wifiStateEnum state;
 
-    /* Now Connect with Wifi */
-    wifi_connect();
-    MYLOG("Waiting for Wifi to connect");
+    pingManager& ping = pingManager::instance();
 
-    do
-    {
-        status = get_wifi_status(iface);
-
-        if (status.state >= WIFI_STATE_ASSOCIATED)
-        {
-            break;
-        }
-
-    }while(1);
-
-    MYLOG("Checking Wifi Status");
-
-    wifi_status();
-
-    if (get_wifi_status(iface).state == WIFI_STATE_ASSOCIATED)
-    {
-        MYLOG("Wifi Connected");
-    }
-    else
-    {
-        MYLOG("Wifi Not Connected. State: %d", status.state);
-    }
-
-    /* Check for IP address assignment */
-    struct net_if_ipv4 *ipv4 = net_if_get_config(iface)->ip.ipv4;
-
-    if (ipv4 && ipv4->unicast[0].ipv4.is_used)
-    {
-        struct in_addr addr = ipv4->unicast[0].ipv4.address.in_addr;
-        char ip_str[NET_IPV4_ADDR_LEN];
-
-        net_addr_ntop(AF_INET, &addr, ip_str, sizeof(ip_str));
-        MYLOG("✅ IP address assigned: %s", ip_str);
-    }
-    else
-    {
-        MYLOG("❌ No IPv4 address assigned yet");
-
-        /* Wait for the handler to be called */
-        int64_t start = k_uptime_get();
-        ipv4_sem_take();
-
-        /* wait for ip address to be assigned */
-        MYLOG("⏰ Time to wait for IP Address to be assigned: %lld ms",(k_uptime_get() - start));
-
-    }
-
-    MYLOG("Disconnecting WIFI");
-    wifi_disconnect();
-    MYLOG("WIFI Disconnected");
-
-    // connectedStateImp connected;
-    // errorStateImp error;  // temporary nullptr for now
-    // connectingStateImp connecting;
-    // scanningStateImp scanning;
-    // idleStateImp idle;
-    // error = errorStateImp(&idle);  // now set correct idle pointer
-
-    wifiStateIdle idle(nullptr);
-    wifiStateDisconnected disconnected(&idle);
-    wifiStateConnected connected(&disconnected);
-    wifiStateConnecting connecting(&connected);
-    idle = wifiStateIdle(&connecting);
-
-    wifiContext wifi(&idle);
-
-    MYLOG("🚀 Starting Wi-Fi State Machine");
+    ping.init();
 
     while (true)
     {
-        wifi.update();
-        k_busy_wait(20000000);
-    }
+        wifi.tick();
+        state = wifi.getWifiState();
 
+        if (wifiStateEnum::IDLE == state)
+        {
+            /* If 500ms have passed we can connect using Wifi */
+            if ((k_uptime_get() - start > 500) && !isConnectRequested)
+            {
+                MYLOG("Waiting for Wifi to connect");
+                wifi.connect();
+                isConnectRequested = true;
+                isNewConnect = true;
+            }
+        }
+        else if (wifiStateEnum::CONNECTING == state)
+        {
+            /* Wait for Connection to be established */
+            if (k_uptime_get() - start > 60000)
+            {
+                MYLOG("❌ Failed to connect to Wifi");
+                /* Disconnect from Wifi */
+                wifi.disconnect();
+
+                /* Get New start of time for reconnection */
+                start = k_uptime_get();
+            }
+        }
+        else if (wifiStateEnum::CONNECTED == state)
+        {
+            /* Do WiFi Stuff after this */
+            isConnectRequested = false;
+
+            if (true == isNewConnect)
+            {
+                start = k_uptime_get();
+                isNewConnect = false;
+            }
+
+            /* Reset the time and check after every 10 seconds */
+            if ((k_uptime_get() - start > 10000) && !isNewConnect)
+            {
+                /* Send ping to Remote Server */
+                ping.send_ping("8.8.8.8", wifi.get_wifi_iface());
+
+                /* Send Ping to the Local server */
+                ping.send_ping("192.168.0.223", wifi.get_wifi_iface());
+
+                start = k_uptime_get();
+
+                ticks++;
+
+                if (ticks == 6)
+                {
+                    MYLOG("✅ Wifi still Connected");
+                    ticks = 0;
+                }
+            }
+        }
+        else if (wifiStateEnum::ERROR == state)
+        {
+            if (k_uptime_get() - start > 10000)
+            {
+                MYLOG("❌ Error in Wifi Initialization. ReInitializing");
+                wifi.connect();
+                start = k_uptime_get();
+            }
+        }
+        else if (wifiStateEnum::DISCONNECTED == state)
+        {
+            /* Connect after 10 seconds */
+            if (k_uptime_get() - start > 10000)
+            {
+                MYLOG("❌ Wifi Reconnecting");
+                wifi.connect();
+
+                /* Get New start of time for reconnection */
+                start = k_uptime_get();
+            }
+        }
+    }
 
     return 0;
 }
