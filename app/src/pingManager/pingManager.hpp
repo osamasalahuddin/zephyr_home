@@ -16,6 +16,7 @@ public:
 
     void init();
     void send_ping(const char* ip, struct net_if *iface = nullptr);
+    void tick();
     void cleanup();
 
     struct PingRequest
@@ -25,8 +26,11 @@ public:
     };
 
 private:
+    /* Define a timeout threshold (e.g., 5000ms or 5 seconds) */
+    const uint16_t PING_TIMEOUT_MS = 5000;
     std::vector<PingRequest> pending_requests;
     struct net_icmp_ctx icmp_ctx;
+
 
 
     pingManager() = default;

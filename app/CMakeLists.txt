@@ -88,6 +88,8 @@ target_link_libraries(app PRIVATE zephyr_interface)
 target_compile_definitions(app PRIVATE
     WIFI_SSID="$ENV{WIFI_SSID}"
     WIFI_PASSWORD="$ENV{WIFI_PASSWORD}"
+    MY_REMOTE="$ENV{MY_REMOTE}"
+    MY_LOCAL="$ENV{MY_LOCAL}"
 )
 
 #-------------------------------------------

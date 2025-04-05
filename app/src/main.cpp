@@ -48,9 +48,13 @@ int main(void)
 
     ping.init();
 
+    const std::string CONFIG_MY_LOCAL(MY_LOCAL);
+    const std::string CONFIG_MY_REMOTE(MY_REMOTE);
+
     while (true)
     {
         wifi.tick();
+        ping.tick();
         state = wifi.getWifiState();
 
         if (wifiStateEnum::IDLE == state)
@@ -92,10 +96,10 @@ int main(void)
             if ((k_uptime_get() - start > 10000) && !isNewConnect)
             {
                 /* Send ping to Remote Server */
-                ping.send_ping("8.8.8.8", wifi.get_wifi_iface());
+                ping.send_ping(CONFIG_MY_REMOTE.c_str(), wifi.get_wifi_iface());
 
                 /* Send Ping to the Local server */
-                ping.send_ping("192.168.0.223", wifi.get_wifi_iface());
+                ping.send_ping(CONFIG_MY_LOCAL.c_str(), wifi.get_wifi_iface());
 
                 start = k_uptime_get();
 
