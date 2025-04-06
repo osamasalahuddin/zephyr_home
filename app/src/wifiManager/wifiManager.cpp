@@ -46,23 +46,32 @@ bool registered = [] {
 static struct net_mgmt_event_callback wifi_cb;
 static struct net_mgmt_event_callback ipv4_cb;
 
-wifiManager* wifiManager::getInstance()
+static wifiManager* instance_ptr = nullptr;
+
+wifiManager& wifiManager::getInstance()
 {
-    return this;
+    if (!instance_ptr)
+    {
+        static wifiManager inst;
+        instance_ptr = &inst;
+    }
+    return *instance_ptr;
 }
 
 void wifiManager::register_wifi_events()
 {
-    net_mgmt_init_event_callback(&wifi_cb, this->wifi_mgmt_event_handler,
+    net_mgmt_init_event_callback(&wifi_cb, wifi_mgmt_event_handler,
                                     NET_EVENT_WIFI_CONNECT_RESULT |
                                     NET_EVENT_WIFI_DISCONNECT_RESULT |
                                     NET_EVENT_WIFI_SCAN_RESULT );
 
-    net_mgmt_init_event_callback(&ipv4_cb, this->ipv4_mgmt_event_handler, NET_EVENT_IPV4_ADDR_ADD);
+    net_mgmt_init_event_callback(&ipv4_cb, ipv4_mgmt_event_handler, NET_EVENT_IPV4_ADDR_ADD);
 
     net_mgmt_add_event_callback(&wifi_cb);
     net_mgmt_add_event_callback(&ipv4_cb);
 
+    /* Save the pointer for the static event handlers */
+    instance_ptr = this;
 }
 
 void wifiManager::reinit()

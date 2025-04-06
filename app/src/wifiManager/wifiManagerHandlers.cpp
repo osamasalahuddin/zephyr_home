@@ -4,8 +4,6 @@
 
 static K_SEM_DEFINE(ipv4_address_obtained, 0, 1);
 
-extern wifiManager wifi;
-
 /* Wrappers for Semaphore to be used by Application */
 void wifiManager::ipv4_sem_take(void)
 {
@@ -45,7 +43,7 @@ void wifiManager::handle_wifi_connect_result(struct net_mgmt_event_callback *cb)
     else
     {
         MYLOG("Connect Handler: Wifi Connected");
-        wifi.connecting->setConnectedCalled(true);
+        connecting->setConnectedCalled(true);
     }
 }
 
@@ -53,13 +51,13 @@ void wifiManager::handle_wifi_disconnect_result(struct net_mgmt_event_callback *
 {
     const struct wifi_status *status = (const struct wifi_status *)cb->info;
 
-    if (DISCONNECTED != wifi.state)
+    if (DISCONNECTED != getInstance().state)
     {
         if (status->status)
         {
             MYLOG("[Disconnect Handler] ❌ Wifi Disconnected without Disconnect being called Before");
             MYLOG("[Disconnect Handler] Reason: Disconnection request (%d)", status->disconn_reason);
-            wifi.context->setState(static_cast<wifiState *>(wifi.error));
+            getInstance().context->setState(static_cast<wifiState *>(getInstance().error));
         }
     }
     else
@@ -73,7 +71,7 @@ void wifiManager::handle_ipv4_result(struct net_if *iface)
     int i = 0;
 
     if (NET_EVENT_IPV4_ADDR_DEL)
-    MYLOG("IPv4 Handler: IPv4 Address Obtained");;
+    MYLOG("IPv4 Handler: IPv4 Address Obtained");
 
     for (i = 0; i < NET_IF_MAX_IPV4_ADDR; i++)
     {
@@ -112,6 +110,8 @@ void wifiManager::ipv4_mgmt_event_handler(struct net_mgmt_event_callback *cb,
 
     if (mgmt_event && _NET_EVENT_IPV4_BASE)
     {
+        wifiManager wifi = wifiManager::getInstance();
+
         if ((mgmt_event & (NET_EVENT_IPV4_CMD_ADDR_ADD |
                           NET_EVENT_IPV4_CMD_ADDR_DEL |
                           NET_EVENT_IPV4_CMD_MADDR_ADD ))
@@ -124,7 +124,7 @@ void wifiManager::ipv4_mgmt_event_handler(struct net_mgmt_event_callback *cb,
         else if (mgmt_event & NET_EVENT_IPV4_CMD_ADDR_ADD)
         {
             MYLOG("✅ IPv4 address added");
-            handle_ipv4_result(iface);
+            wifi.handle_ipv4_result(iface);
         }
         else if (mgmt_event & NET_EVENT_IPV4_CMD_ADDR_DEL)
         {
@@ -139,15 +139,13 @@ void wifiManager::ipv4_mgmt_event_handler(struct net_mgmt_event_callback *cb,
             MYLOG("❌ IPv4 Multicast address removed");
         }
     }
-
-    MYLOG("Raw event: 0x%08X", mgmt_event);
 }
 
 void wifiManager::wifi_mgmt_event_handler(struct net_mgmt_event_callback *cb,
                                     uint32_t mgmt_event,
                                     struct net_if *iface)
 {
-    MYLOG("Wifi Event Handler Called : 0x%08X", mgmt_event);
+    MYLOG("[Wifi] Event Handler Called : 0x%08X", mgmt_event);
 
     if (mgmt_event && _NET_WIFI_EVENT)
     {
@@ -156,32 +154,24 @@ void wifiManager::wifi_mgmt_event_handler(struct net_mgmt_event_callback *cb,
         MYLOG("[Legend] NET_EVENT_WIFI_SCAN_RESULT : 0x%08lX", NET_EVENT_WIFI_SCAN_RESULT);
         MYLOG("[Legend] NET_EVENT_WIFI_DISCONNECT_RESULT : 0x%08lX", NET_EVENT_WIFI_DISCONNECT_RESULT);
 
+        wifiManager instance = wifiManager::getInstance();
+
         if (mgmt_event & NET_EVENT_WIFI_CMD_CONNECT_RESULT)
         {
-            wifi.handle_wifi_connect_result(cb);
+            instance.handle_wifi_connect_result(cb);
         }
         if (mgmt_event & NET_EVENT_WIFI_CMD_CONNECT_RESULT)
         {
-            wifi.handle_wifi_disconnect_result(cb);
+            instance.handle_wifi_disconnect_result(cb);
         }
-        if (mgmt_event & NET_EVENT_WIFI_CMD_SCAN_RESULT)
-        {
-            wifi.handle_wifi_scan_result(cb);
-        }
-        // switch (mgmt_event)
+        // if (mgmt_event & NET_EVENT_WIFI_CMD_SCAN_RESULT)
         // {
-        //     case NET_EVENT_WIFI_CONNECT_RESULT:
-        //         wifi.handle_wifi_connect_result(cb);
-        //         break;
-        //     case NET_EVENT_WIFI_SCAN_DONE:
-        //     case NET_EVENT_WIFI_SCAN_RESULT:
-        //         wifi.handle_wifi_scan_result(cb);
-        //         break;
-        //     case NET_EVENT_WIFI_DISCONNECT_RESULT:
-        //         wifi.handle_wifi_disconnect_result(cb);
-        //         break;
-        //     default:
-        //         break;
+        //     handle_wifi_scan_result(cb);
+        // }
+        // if (mgmt_event & (NET_EVENT_WIFI_CMD_SCAN_DONE
+        //                 | NET_EVENT_WIFI_CMD_SCAN_RESULT))
+        // {
+        //     handle_wifi_scan_result(cb);
         // }
     }
 
