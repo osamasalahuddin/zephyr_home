@@ -6,7 +6,7 @@
 
 static pingManager* instance_ptr = nullptr;
 
-pingManager& pingManager::instance()
+pingManager& pingManager::getInstance()
 {
     if (!instance_ptr)
     {
@@ -54,7 +54,7 @@ void pingManager::send_ping(const char* ip, struct net_if *iface)
         ret = net_icmp_send_echo_request(&icmp_ctx, iface, (struct sockaddr*)&dst, &params, nullptr);
         if (ret == 0)
         {
-            MYLOG("✅ Ping sent to %s", ip);
+            MYLOG("Ping sent to %s", ip);
             pending_requests.push_back({k_uptime_get(), ip});
         } else
         {
@@ -68,18 +68,20 @@ void pingManager::tick()
 {
     int64_t current_time = k_uptime_get();
 
-    // Iterate through pending requests and check for timeouts
+    /* Iterate through pending requests and check for timeouts */
     auto it = pending_requests.begin();
     while (it != pending_requests.end())
     {
         if (current_time - it->start_time > PING_TIMEOUT_MS)
         {
             MYLOG("❌ Ping to %s timed out", it->ip.c_str());
-            it = pending_requests.erase(it); // Remove the timed-out request
+            /* Remove the timed-out request */
+            it = pending_requests.erase(it);
         }
         else
         {
-            ++it; // Move to the next request
+            /* Move to the next request */
+            ++it;
         }
     }
 }
@@ -109,7 +111,8 @@ int pingManager::handle_reply(struct net_icmp_ctx* ctx, struct net_pkt* pkt,
     if (it != instance_ptr->pending_requests.end())
     {
         int64_t end_time = k_uptime_get() - it->start_time;
-        MYLOG("Received ping reply from %s %lldms", addr_str, end_time);
+        MYLOG("✅ Received ping reply from %s %lldms", addr_str, end_time);
+
         /* Remove the completed request */
         instance_ptr->pending_requests.erase(it);
     }
