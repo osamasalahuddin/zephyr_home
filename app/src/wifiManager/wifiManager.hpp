@@ -35,9 +35,9 @@ private:
 
     /* Handlers */
     void handle_wifi_scan_result(struct net_mgmt_event_callback *cb);
-    static void handle_wifi_connect_result(struct net_mgmt_event_callback *cb);
-    static void handle_wifi_disconnect_result(struct net_mgmt_event_callback *cb);
-    static void handle_ipv4_result(struct net_if *iface);
+    void handle_wifi_connect_result(struct net_mgmt_event_callback *cb);
+    void handle_wifi_disconnect_result(struct net_mgmt_event_callback *cb);
+    void handle_ipv4_result(struct net_if *iface);
 
     /* Semaphore Wrappers */
     void ipv4_sem_take(void);
@@ -54,7 +54,7 @@ public:
     const char* name() const override;
 
     /* Wifi Manager Functions */
-    wifiManager* getInstance();
+    static wifiManager& getInstance();
     void reinit();
     void connect();
     void disconnect();
