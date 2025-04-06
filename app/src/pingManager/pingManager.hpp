@@ -12,7 +12,7 @@
 class pingManager
 {
 public:
-    static pingManager& instance();
+    static pingManager& getInstance();
 
     void init();
     void send_ping(const char* ip, struct net_if *iface = nullptr);
