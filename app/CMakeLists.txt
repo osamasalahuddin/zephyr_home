@@ -30,6 +30,9 @@ project(app)
 # Main
 target_sources(app PRIVATE src/main.cpp)
 
+# Network Manager
+target_sources(app PRIVATE src/networkManager/networkManager.cpp)
+
 # Ping Manager
 target_sources(app PRIVATE src/pingManager/pingManager.cpp)
 
@@ -56,6 +59,9 @@ target_sources(app PRIVATE src/wifiSM/wifiStateIdle.cpp)
 # zephyr_syscall_include_directories(./../include/app/drivers/)
 # zephyr_include_directories(./../include)
 # zephyr_include_directories(./../include/app/drivers/)
+
+# Network Manager
+target_include_directories(app PRIVATE src/networkManager)
 
 # Ping Manager
 target_include_directories(app PRIVATE src/pingManager)
