@@ -42,8 +42,7 @@ void wifiManager::handle_wifi_connect_result(struct net_mgmt_event_callback *cb)
     }
     else
     {
-        MYLOG("Connect Handler: Wifi Connected");
-        connecting->setConnectedCalled(true);
+        MYLOG("[Connect Handler]: Wifi Connected");
     }
 }
 
@@ -95,6 +94,8 @@ void wifiManager::handle_ipv4_result(struct net_if *iface)
                 net_addr_ntop(AF_INET,
                                 &iface->config.ip.ipv4->gw,
                                 buf, sizeof(buf)));
+
+        connecting->setIsConnected(true);
     }
 
     k_sem_give(&ipv4_address_obtained);
@@ -123,20 +124,20 @@ void wifiManager::ipv4_mgmt_event_handler(struct net_mgmt_event_callback *cb,
         }
         else if (mgmt_event & NET_EVENT_IPV4_CMD_ADDR_ADD)
         {
-            MYLOG("✅ IPv4 address added");
+            MYLOG("[IPv4] ✅ IPv4 address added");
             wifi.handle_ipv4_result(iface);
         }
         else if (mgmt_event & NET_EVENT_IPV4_CMD_ADDR_DEL)
         {
-            MYLOG("❌ IPv4 address removed");
+            MYLOG("[IPv4] ❌ IPv4 address removed");
         }
         else if (mgmt_event & NET_EVENT_IPV4_CMD_MADDR_ADD)
         {
-            MYLOG("✅ IPv4 Multicast address added");
+            MYLOG("[IPv4] ✅ IPv4 Multicast address added");
         }
         else if (mgmt_event & NET_EVENT_IPV4_CMD_MADDR_DEL)
         {
-            MYLOG("❌ IPv4 Multicast address removed");
+            MYLOG("[IPv4] ❌ IPv4 Multicast address removed");
         }
     }
 }
@@ -162,7 +163,11 @@ void wifiManager::wifi_mgmt_event_handler(struct net_mgmt_event_callback *cb,
         }
         if (mgmt_event & NET_EVENT_WIFI_CMD_CONNECT_RESULT)
         {
-            instance.handle_wifi_disconnect_result(cb);
+            if (instance.getWifiState() == wifiStateEnum::CONNECTED)
+            {
+                /* Only Call if it is in connected state already */
+                instance.handle_wifi_disconnect_result(cb);
+            }
         }
         // if (mgmt_event & NET_EVENT_WIFI_CMD_SCAN_RESULT)
         // {

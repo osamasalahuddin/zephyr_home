@@ -44,6 +44,7 @@ class wifiStateConnecting : public wifiState
 private:
     bool isConnectedCalled = false;
     bool isAssociated = false;
+    bool isConnected = false;
     struct net_if* iface;
     wifiStateConnected* connected;
     wifiStateConnected* error;
@@ -53,6 +54,7 @@ public:
     void enter(wifiContext& ctx, net_if* iface) override;
     void handle(wifiContext& ctx, wifi_iface_status status) override;
     int name(void) const override;
+    void setIsConnected(bool value);
     void setConnectedCalled(bool value);
     bool getConnectedCalled(void);
 };
