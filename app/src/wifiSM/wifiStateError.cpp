@@ -5,9 +5,7 @@ wifiStateError::wifiStateError(wifiStateIdle* idleState,
                                wifiStateDisconnected* disconnectedState)
                             : idle(idleState), disconnected(disconnectedState)
 {
-    MYLOG("🛑 Initializing Error State");
     this->idle = idleState;
-    MYLOG("🛑 Error state initialized");
 }
 
 void wifiStateError::enter(wifiContext& ctx, net_if* iface)
@@ -19,7 +17,6 @@ void wifiStateError::handle(wifiContext& ctx, wifi_iface_status status)
 {
     MYLOG("⚠️ Handling error... Going to Disconnected state");
     ctx.setState(static_cast<wifiState*>(this->disconnected));
-    // Optionally retry or escalate
 }
 
 int wifiStateError::name() const
