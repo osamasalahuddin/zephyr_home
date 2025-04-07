@@ -5,9 +5,10 @@
  * @brief Get the singleton instance of the networkManager class.
  * @return Reference to the singleton instance.
  */
-networkManager& networkManager::instance()
+networkManager& networkManager::getInstance()
 {
-    static networkManager instance; /* Singleton instance */
+    /* Singleton instance */
+    static networkManager instance;
     return instance;
 }
 
@@ -21,7 +22,7 @@ networkManager::networkManager():
                 CONFIG_MY_REMOTE(MY_REMOTE),
                 isConnectRequested(false),
                 isNewConnect(false),
-                state(wifiStateEnum::IDLE),
+                wifiState(wifiStateEnum::IDLE),
                 start(0),
                 ticks(0)
 {
@@ -51,9 +52,9 @@ void networkManager::tick()
 {
     wifi.tick();
     ping.tick();
-    state = wifi.getWifiState();
+    wifiState = wifi.getWifiState();
 
-    if (wifiStateEnum::IDLE == state)
+    if (wifiStateEnum::IDLE == wifiState)
     {
         /* If 500ms have passed we can connect using Wifi */
         if ((k_uptime_get() - start > 500) && !isConnectRequested)
@@ -64,7 +65,7 @@ void networkManager::tick()
             isNewConnect = true;
         }
     }
-    else if (wifiStateEnum::CONNECTING == state)
+    else if (wifiStateEnum::CONNECTING == wifiState)
     {
         /* Wait for Connection to be established */
         if (k_uptime_get() - start > 60000)
@@ -77,7 +78,7 @@ void networkManager::tick()
             start = k_uptime_get();
         }
     }
-    else if (wifiStateEnum::CONNECTED == state)
+    else if (wifiStateEnum::CONNECTED == wifiState)
     {
         /* Do WiFi Stuff after this */
         isConnectRequested = false;
@@ -108,7 +109,7 @@ void networkManager::tick()
             }
         }
     }
-    else if (wifiStateEnum::ERROR == state)
+    else if (wifiStateEnum::ERROR == wifiState)
     {
         if (k_uptime_get() - start > 10000)
         {
@@ -117,7 +118,7 @@ void networkManager::tick()
             start = k_uptime_get();
         }
     }
-    else if (wifiStateEnum::DISCONNECTED == state)
+    else if (wifiStateEnum::DISCONNECTED == wifiState)
     {
         /* Connect after 10 seconds */
         if (k_uptime_get() - start > 10000)
@@ -129,4 +130,59 @@ void networkManager::tick()
             start = k_uptime_get();
         }
     }
+}
+
+
+/**
+ * @brief Get the name of the manager.
+ * @return Name of the manager.
+ */
+const char* networkManager::name() const
+{
+    return "networkManager";
+}
+
+
+/**
+ * @brief Get if the network is connected to LAN.
+ * @return True or False if connected to LAN.
+ */
+bool networkManager::isConnectedLAN()
+{
+    return isLanConnected;
+}
+
+/**
+ * @brief Get if the network is connected to WAN.
+ * @return True or False if connected to WAN.
+ */
+ bool networkManager::isConnectedWAN()
+ {
+    return isWanConnected;
+ }
+
+
+/**
+ * @brief Function to check if the network is up or not.
+ * @return True if network is up, false otherwise.
+ */
+bool networkManager::isNetworkUp()
+{
+    return (wifi.getWifiState() == wifiStateEnum::CONNECTED);
+}
+
+/**
+ * @brief Callback that will be called by pingManager for Local Server Request.
+ */
+void networkManager::setIsConnectedLAN(bool value)
+{
+    getInstance().isLanConnected = value;
+}
+
+/**
+ * @brief Callback that will be called by pingManager for Remote Server Request.
+ */
+void networkManager::setIsConnectedWAN(bool value)
+{
+    getInstance().isWanConnected = value;
 }
