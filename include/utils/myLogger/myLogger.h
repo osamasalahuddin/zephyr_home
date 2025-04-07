@@ -10,8 +10,10 @@
     Logging macro with formatted uptime
     and trimmed file path (removes top 2 folders)
 */
+#define LOG_MSG_LENGTH 512
+
 #define MYLOG(fmt, ...) do {                                            \
-    char __mylog_msg[512];                                              \
+    char __mylog_msg[LOG_MSG_LENGTH];                                   \
                                                                         \
     /* Get full path from __FILE__ */                                   \
     const char* __full_path = __FILE__;                                 \
@@ -40,6 +42,6 @@
              __hours, __minutes, __seconds, __milliseconds,             \
              __short_file, __LINE__);                                   \
     snprintf(__mylog_msg, sizeof(__mylog_msg), fmt, ##__VA_ARGS__);     \
-    printk("%s\n", __mylog_msg);                                          \
+    printk("%s\n", __mylog_msg);                                        \
 } while (0)
 
