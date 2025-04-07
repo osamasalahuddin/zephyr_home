@@ -69,9 +69,6 @@ void wifiManager::register_wifi_events()
 
     net_mgmt_add_event_callback(&wifi_cb);
     net_mgmt_add_event_callback(&ipv4_cb);
-
-    /* Save the pointer for the static event handlers */
-    instance_ptr = this;
 }
 
 void wifiManager::reinit()

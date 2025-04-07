@@ -41,8 +41,8 @@ private:
     const std::string CONFIG_MY_LOCAL;
     const std::string CONFIG_MY_REMOTE;
 
-    /** WiFi instance */
-    wifiManager wifi;
+    /** WiFi instance pointer */
+    wifiManager& wifi;
 
     /** PingManager instance pointer */
     pingManager& ping;
