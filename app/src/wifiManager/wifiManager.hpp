@@ -15,6 +15,9 @@
 class wifiManager : public iManager
 {
 private:
+    /* Declaration of the static Singleton */
+    static wifiManager* instance_ptr;
+
     bool isConnecting = false;
     bool isError = false;
     bool isIpObtained = false;
@@ -30,6 +33,8 @@ private:
     wifiStateError* error;
 
     struct net_if *iface;
+    struct net_mgmt_event_callback wifi_cb;
+    struct net_mgmt_event_callback ipv4_cb;
 
     void register_wifi_events();
 
@@ -49,6 +54,7 @@ private:
 
     void setScanComplete(bool);
 public:
+    wifiManager();
     void init() override;
     void tick() override;
     const char* name() const override;

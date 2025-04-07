@@ -18,13 +18,39 @@ int main(void)
     MYLOG("Hello World!");
 
     /* Initialize Network Manager */
-    networkManager& network = networkManager::instance();
+    networkManager& network = networkManager::getInstance();
     network.init();
+
+
+    uint64_t start = k_uptime_get();
 
     while (true)
     {
         network.tick();
-    }
 
+        if (network.isNetworkUp())
+        {
+            if (k_uptime_get() - start > 10000)
+            {
+                start = k_uptime_get();
+                if (network.isConnectedLAN())
+                {
+                    MYLOG(" 💻 Connected to LAN");
+                }
+                else
+                {
+                    MYLOG("Not connected to LAN");
+                }
+                if (network.isConnectedWAN())
+                {
+                    MYLOG("🌐 Connected to WAN");
+                }
+                else
+                {
+                    MYLOG("Not connected to WAN");
+                }
+            }
+        }
+    }
     return 0;
 }
