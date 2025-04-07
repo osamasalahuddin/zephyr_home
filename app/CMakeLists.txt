@@ -30,22 +30,28 @@ project(app)
 # Main
 target_sources(app PRIVATE src/main.cpp)
 
+# Manager Factory
+target_sources(app PRIVATE src/managerFactory/managerFactory.cpp)
+
 # Network Manager
 target_sources(app PRIVATE src/networkManager/networkManager.cpp)
+
+# Network Manager
+target_sources(app PRIVATE src/networkTimeManager/networkTimeManager.cpp)
 
 # Ping Manager
 target_sources(app PRIVATE src/pingManager/pingManager.cpp)
 
 # Socket Manager
 target_sources(app PRIVATE src/socketManager/socketManager.cpp)
+
 # Socket Strategy
 target_sources(app PRIVATE src/socketStrategy/socketStrategy.cpp)
 
-# Manager Factory
-target_sources(app PRIVATE src/managerFactory/managerFactory.cpp)
 # Wifi Manager
 target_sources(app PRIVATE src/wifiManager/wifiManager.cpp)
 target_sources(app PRIVATE src/wifiManager/wifiManagerHandlers.cpp)
+
 # Wifi State Machine
 target_sources(app PRIVATE src/wifiSM/wifiContext.cpp)
 target_sources(app PRIVATE src/wifiSM/wifiStateConnected.cpp)
@@ -62,6 +68,9 @@ target_sources(app PRIVATE src/wifiSM/wifiStateIdle.cpp)
 
 # Network Manager
 target_include_directories(app PRIVATE src/networkManager)
+
+# Network Time Manager
+target_include_directories(app PRIVATE src/networkTimeManager)
 
 # Ping Manager
 target_include_directories(app PRIVATE src/pingManager)
