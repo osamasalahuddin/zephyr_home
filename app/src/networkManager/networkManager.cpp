@@ -93,20 +93,14 @@ void networkManager::tick()
         if ((k_uptime_get() - start > 10000) && !isNewConnect)
         {
             /* Send ping to Remote Server */
-            ping.send_ping(CONFIG_MY_REMOTE.c_str(), wifi.get_wifi_iface());
+            ping.send_ping(CONFIG_MY_REMOTE.c_str(), wifi.get_wifi_iface(), setIsConnectedWAN);
 
             /* Send Ping to the Local server */
-            ping.send_ping(CONFIG_MY_LOCAL.c_str(), wifi.get_wifi_iface());
+            ping.send_ping(CONFIG_MY_LOCAL.c_str(), wifi.get_wifi_iface(), setIsConnectedLAN);
 
             start = k_uptime_get();
 
             ticks++;
-
-            if (ticks == 6)
-            {
-                MYLOG("✅ Wifi still Connected");
-                ticks = 0;
-            }
         }
     }
     else if (wifiStateEnum::ERROR == wifiState)
