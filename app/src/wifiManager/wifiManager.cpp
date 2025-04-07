@@ -43,10 +43,19 @@ bool registered = [] {
 
 }
 
-static struct net_mgmt_event_callback wifi_cb;
-static struct net_mgmt_event_callback ipv4_cb;
+/* Definition of the static Singleton */
+wifiManager* wifiManager::instance_ptr;
 
-static wifiManager* instance_ptr = nullptr;
+wifiManager::wifiManager():
+            isConnecting(false),
+            isError(false),
+            isIpObtained(false),
+            isScanComplete(false),
+            state(IDLE),
+            iface(nullptr)
+{
+    instance_ptr = nullptr;
+}
 
 wifiManager& wifiManager::getInstance()
 {
