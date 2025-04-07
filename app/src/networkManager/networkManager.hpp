@@ -89,8 +89,26 @@ private:
     int64_t start;
     uint8_t ticks;
 
-    /** String Values gotten from build system for LAN and WAN Servers */
+    /**
+     * @brief Wait time before starting of the Wifi SM
+     * @note This is set to 500ms
+     */
+    const uint16_t WIFI_START_DELAY;
+
+    /**
+     * @brief Wait time for letting Wifi to connect to the network
+     * @note This is set to 120 seconds
+     */
+    const uint16_t WIFI_CONNECT_TIMEOUT;
+
+    /**
+     * @brief String Values gotten from build system for LAN Server
+     */
     const std::string CONFIG_MY_LOCAL;
+
+    /**
+     * @brief String Values gotten from build system for WAN Server
+     */
     const std::string CONFIG_MY_REMOTE;
 
     /** WiFi instance pointer */

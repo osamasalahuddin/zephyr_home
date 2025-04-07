@@ -18,6 +18,8 @@ networkManager& networkManager::getInstance()
 networkManager::networkManager():
                 ping(pingManager::getInstance()),
                 wifi(wifiManager::getInstance()),
+                WIFI_START_DELAY(500U),
+                WIFI_CONNECT_TIMEOUT(120000U),
                 CONFIG_MY_LOCAL(MY_LOCAL),
                 CONFIG_MY_REMOTE(MY_REMOTE),
                 isConnectRequested(false),
@@ -57,7 +59,7 @@ void networkManager::tick()
     if (wifiStateEnum::IDLE == wifiState)
     {
         /* If 500ms have passed we can connect using Wifi */
-        if ((k_uptime_get() - start > 500) && !isConnectRequested)
+        if ((k_uptime_get() - start > WIFI_START_DELAY) && !isConnectRequested)
         {
             MYLOG("Waiting for Wifi to connect");
             wifi.connect();
@@ -68,9 +70,10 @@ void networkManager::tick()
     else if (wifiStateEnum::CONNECTING == wifiState)
     {
         /* Wait for Connection to be established */
-        if (k_uptime_get() - start > 60000)
+        if (k_uptime_get() - start > WIFI_CONNECT_TIMEOUT)
         {
-            MYLOG("❌ Failed to connect to Wifi");
+            MYLOG("❌ Failed to connect to Wifi ");
+
             /* Disconnect from Wifi */
             wifi.disconnect();
 
