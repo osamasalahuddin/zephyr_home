@@ -59,11 +59,10 @@ void pingManager::send_ping(const char* ip,
         dst.sin_family = AF_INET;
         dst.sin_port = 0;
 
-        // struct net_if* iface = net_if_get_default();
         ret = net_icmp_send_echo_request(&icmp_ctx, iface, (struct sockaddr*)&dst, &params, nullptr);
         if (ret == 0)
         {
-            MYLOG("Ping sent to %s", ip);
+            MYLOG("🏓 Ping sent to %s", ip);
             pending_requests.push_back({k_uptime_get(), ip, callback});
         } else
         {
