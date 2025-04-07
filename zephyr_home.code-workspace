@@ -38,7 +38,7 @@
         "C_Cpp.default.defines": [],
         "C_Cpp.default.compilerPath": "/usr/bin/gcc",
         "C_Cpp.default.cStandard": "c17",
-        "C_Cpp.default.cppStandard": "gnu++17",
+        "C_Cpp.default.cppStandard": "gnu++20",
         "C_Cpp.default.intelliSenseMode": "linux-gcc-x64",
         "C_Cpp.default.compileCommands": [
             "${workspaceFolder}/build/compile_commands.json",
@@ -50,6 +50,21 @@
             {
                 "label": "Build Flash Monitor",
                 "command": "source ../.venv/bin/activate && clear && west build -b esp32_devkitc_wroom/esp32/procpu app && west flash && west espressif monitor",
+                "type": "shell",
+                "args": [],
+                "problemMatcher": [
+                    "$tsc"
+                ],
+                "presentation": {
+                    "reveal": "always"
+                },
+                "group": {
+                    "kind": "build",
+                }
+            },
+            {
+                "label": "Build Flash",
+                "command": "source ../.venv/bin/activate && clear && west build -b esp32_devkitc_wroom/esp32/procpu app && west flash",
                 "type": "shell",
                 "args": [],
                 "problemMatcher": [
@@ -90,8 +105,42 @@
                     "reveal": "always"
                 },
                 "group": {
-                    "kind": "build",
+                    "kind": "test",
                 }
+            },
+            {
+                "label": "Monitor Only",
+                "type": "shell",
+                "command": "source ../.venv/bin/activate && clear && west espressif monitor",
+                "problemMatcher": [],
+                "presentation": {
+                    "echo": true,
+                    "reveal": "always",
+                    "focus": false,
+                    "panel": "shared"
+                },
+                "group": {
+                    "kind": "test",
+                }
+            }
+        ]
+    },
+    "launch":
+    {
+        "version": "0.2.0",
+        "configurations":
+        [
+            {
+                "name": "Monitor Zephyr (ESP)",
+                "type": "cppdbg",  // dummy type just to allow F5 binding
+                "request": "launch",
+                "preLaunchTask": "Monitor Only",
+                "program": "",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceFolder:zephyr_home}",
+                "environment": [],
+                // "console": "integratedTerminal"
             }
         ]
     }

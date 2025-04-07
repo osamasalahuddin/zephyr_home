@@ -1,5 +1,8 @@
 # Zephyr Example Application
 
+<a href="https://wakatime.com/badge/github/osamasalahuddin/zephyr_home">
+    <img src="https://wakatime.com/badge/github/osamasalahuddin/zephyr_home.svg" alt="wakatime">
+</a>
 <a href="https://github.com/zephyrproject-rtos/example-application/actions/workflows/build.yml?query=branch%3Amain">
   <img src="https://github.com/zephyrproject-rtos/example-application/actions/workflows/build.yml/badge.svg?event=push">
 </a>
