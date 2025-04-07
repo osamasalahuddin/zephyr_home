@@ -1,5 +1,6 @@
 // app/src/net/pingManager.hpp
 #pragma once
+#include "iManager.hpp"
 
 #include <zephyr/net/socket.h>
 #include <zephyr/net/icmp.h>
@@ -9,20 +10,34 @@
 
 #include <vector>
 #include <string>
-class pingManager
+#include <functional>
+class pingManager : public iManager
 {
 public:
+    /**
+     * @brief Constructor for the pingManager class.
+     */
+    pingManager();
+
+    /**
+     * @brief Get the singleton instance of the pingManager class.
+     * @return Reference to the singleton instance.
+     */
     static pingManager& getInstance();
 
-    void init();
-    void send_ping(const char* ip, struct net_if *iface = nullptr);
-    void tick();
+
+    void init() override;
+    void tick() override;
+    const char* name() const override;
+
+    void send_ping(const char* ip, struct net_if *iface = nullptr, std::function<void(bool)> callback = nullptr);
     void cleanup();
 
     struct PingRequest
     {
         int64_t     start_time;
         std::string ip;
+        std::function<void(bool)> callback;
     };
 
 private:
@@ -31,9 +46,6 @@ private:
     std::vector<PingRequest> pending_requests;
     struct net_icmp_ctx icmp_ctx;
 
-
-
-    pingManager() = default;
     static int handle_reply(struct net_icmp_ctx* ctx, struct net_pkt* pkt,
                             struct net_icmp_ip_hdr* ip_hdr,
                             struct net_icmp_hdr* icmp_hdr,

@@ -6,6 +6,13 @@
 
 static pingManager* instance_ptr = nullptr;
 
+
+pingManager::pingManager()
+{
+    /* Initialize the ICMP context */
+    memset(&icmp_ctx, 0, sizeof(icmp_ctx));
+}
+
 pingManager& pingManager::getInstance()
 {
     if (!instance_ptr)
@@ -28,7 +35,9 @@ void pingManager::init()
     }
 }
 
-void pingManager::send_ping(const char* ip, struct net_if *iface)
+void pingManager::send_ping(const char* ip,
+                            struct net_if *iface,
+                            std::function<void(bool)> callback)
 {
     struct sockaddr_in dst = {};
     struct net_icmp_ping_params params;
@@ -55,7 +64,7 @@ void pingManager::send_ping(const char* ip, struct net_if *iface)
         if (ret == 0)
         {
             MYLOG("Ping sent to %s", ip);
-            pending_requests.push_back({k_uptime_get(), ip});
+            pending_requests.push_back({k_uptime_get(), ip, callback});
         } else
         {
             MYLOG("❌ Failed to send ping to %s: %d", ip, ret);
@@ -75,6 +84,13 @@ void pingManager::tick()
         if (current_time - it->start_time > PING_TIMEOUT_MS)
         {
             MYLOG("❌ Ping to %s timed out", it->ip.c_str());
+
+            /* Call the callback if provided */
+            if (it->callback)
+            {
+                it->callback(false);
+            }
+
             /* Remove the timed-out request */
             it = pending_requests.erase(it);
         }
@@ -84,6 +100,12 @@ void pingManager::tick()
             ++it;
         }
     }
+}
+
+
+const char* pingManager::name() const
+{
+    return "pingManager";
 }
 
 void pingManager::cleanup()
@@ -112,6 +134,12 @@ int pingManager::handle_reply(struct net_icmp_ctx* ctx, struct net_pkt* pkt,
     {
         int64_t end_time = k_uptime_get() - it->start_time;
         MYLOG("✅ Received ping reply from %s %lldms", addr_str, end_time);
+
+        /* Call the callback if provided */
+        if (it->callback)
+        {
+            it->callback(true);
+        }
 
         /* Remove the completed request */
         instance_ptr->pending_requests.erase(it);
