@@ -62,7 +62,7 @@ void pingManager::send_ping(const char* ip,
         ret = net_icmp_send_echo_request(&icmp_ctx, iface, (struct sockaddr*)&dst, &params, nullptr);
         if (ret == 0)
         {
-            MYLOG("🏓 Ping sent to %s", ip);
+            // MYLOG("🏓 Ping sent to %s", ip);
             pending_requests.push_back({k_uptime_get(), ip, callback});
         } else
         {
@@ -132,7 +132,7 @@ int pingManager::handle_reply(struct net_icmp_ctx* ctx, struct net_pkt* pkt,
     if (it != instance_ptr->pending_requests.end())
     {
         int64_t end_time = k_uptime_get() - it->start_time;
-        MYLOG("✅ Received ping reply from %s %lldms", addr_str, end_time);
+        // MYLOG("✅ Received ping reply from %s %lldms", addr_str, end_time);
 
         /* Call the callback if provided */
         if (it->callback)
