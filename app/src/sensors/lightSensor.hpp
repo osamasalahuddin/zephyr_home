@@ -18,19 +18,43 @@
 */
 
 #pragma once
+#include "sensor.hpp"
 
-#include <vector>
-#include <string>
-#include "socketManager.hpp"
-
-class sensor
+class lightSensor : public sensor
 {
 public:
-    virtual const char* get_id() const = 0;
-    virtual void tick() = 0;
-    virtual float get_value() const = 0;
-    virtual ~sensor() = default;
-private:
-    virtual float read_value() = 0;
 
+    /**
+     * @brief Constructor for Light Sensor. Initializes the Zypher device.
+     */
+    lightSensor();
+
+    /**
+     * @brief Return the string name of the Sensor.
+     * @return const char* ID of the sensor.
+     */
+    const char* get_id() const override;
+
+    /**
+     * @brief Get the Sensor value.
+     * @return std::float current sensor value.
+     */
+    float get_value() const override;
+
+    /**
+     * @brief Tick function to be called periodically to update the sensor value.
+     */
+    void tick() override;
+
+private:
+
+    /**
+     * @brief Get the updated value from the sensor.
+     * @return std::float current sensor value.
+     */
+    float read_value() override;
+
+    const struct device* dev;
+
+    float lux;
 };

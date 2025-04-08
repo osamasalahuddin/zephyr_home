@@ -12,6 +12,14 @@
     status = "okay";
 };
 
+&i2c0 {
+    light_sensor: tsl2561@39 {
+        compatible = "ams,tsl2561";
+        reg = <0x39>;
+        status = "disabled";
+    };
+};
+
 &touch {
     status = "okay";
 

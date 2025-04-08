@@ -24,9 +24,13 @@
 LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
 
 #include "myLogger.h"
+
 #include "networkManager.hpp"
 #include "networkTimeManager.hpp"
 #include "socketManager.hpp"
+
+#include "sensorManager.hpp"
+#include "lightSensor.hpp"
 
 #define STACK_SIZE      (4096)
 #define TASK_PRIORITY   (-1)
@@ -60,9 +64,15 @@ int main(void)
     /* Main Function */
     MYLOG("Hello World!");
 
+    lightSensor lightSensor;
+    sensorManager sensorMgr;
+
+    sensorMgr.add_sensor(&lightSensor);
+
     /* Initialize Network Manager */
     networkManager& network = networkManager::getInstance();
     network.init();
+
     socketManager& socket = socketManager::instance();
     bool isSocket = false;
 
@@ -91,6 +101,7 @@ int main(void)
         {
             if (k_uptime_get() - start > 10000)
             {
+                sensorMgr.poll_all();
                 start = k_uptime_get();
                 if (network.isConnectedLAN())
                 {

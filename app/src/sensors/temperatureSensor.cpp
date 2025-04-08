@@ -1,7 +1,7 @@
 /*
  * This file is part of the Zephyr Home project.
  *
- * Copyright (C) 2024 Osama Salahuddin
+ * Copyright (C) 2025 Osama Salah-ud-Din
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 #include "sensorManager.hpp"
 #include "temperatureSensor.hpp"
@@ -26,13 +26,19 @@ const char* temperatureSensor::get_id() const
     return "temperature";
 }
 
+float temperatureSensor::get_value() const
+{
+    // Mock sensor value, replace with actual driver read
+    return 22.5f;
+}
+
 float temperatureSensor::read_value()
 {
     // Mock sensor value, replace with actual driver read
     return 22.5f;
 }
 
-void temperatureSensor::poll()
+void temperatureSensor::tick()
 {
     // no-op for polling in this basic implementation
 }

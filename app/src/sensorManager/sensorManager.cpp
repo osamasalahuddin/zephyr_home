@@ -1,7 +1,7 @@
 /*
  * This file is part of the Zephyr Home project.
  *
- * Copyright (C) 2024 Osama Salah-ud-din
+ * Copyright (C) 2025 Osama Salah-ud-Din
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,12 +15,12 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 #include "temperatureSensor.hpp"
+#include "lightSensor.hpp"
 // #include "humiditySensor.hpp"
 // #include "pressureSensor.hpp"
-// #include "lightSensor.hpp"
 
 #include "sensorManager.hpp"
 #include "socketManager.hpp"
@@ -35,7 +35,7 @@ void sensorManager::poll_all()
 {
     for (auto* sensor : sensors)
     {
-        float value = sensor->read_value();
+        float value = sensor->get_value();
         std::string payload = std::string(sensor->get_id()) + ":" + std::to_string(value);
         socketManager::instance().send(payload.c_str(), payload.length());
     }
