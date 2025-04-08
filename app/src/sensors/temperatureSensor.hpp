@@ -1,7 +1,7 @@
 /*
  * This file is part of the Zephyr Home project.
  *
- * Copyright (C) 2024 Osama Salahuddin
+ * Copyright (C) 2025 Osama Salah-ud-Din
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
- */
+*/
 
 #pragma once
 #include "sensor.hpp"
@@ -25,7 +25,10 @@ class temperatureSensor : public sensor
 public:
     const char* get_id() const override;
 
+    float get_value() const override;
+
+    void tick() override;
+private:
     float read_value() override;
 
-    void poll() override;
 };
