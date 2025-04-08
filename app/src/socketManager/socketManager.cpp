@@ -25,7 +25,8 @@ static socketManager* instance_ptr = nullptr;
 
 socketManager& socketManager::instance()
 {
-    if (!instance_ptr) {
+    if (!instance_ptr)
+    {
         static socketManager inst;
         instance_ptr = &inst;
     }
@@ -34,7 +35,8 @@ socketManager& socketManager::instance()
 
 bool socketManager::init(Protocol protocol, const std::string& host, uint16_t port)
 {
-    switch (protocol) {
+    switch (protocol)
+    {
         case Protocol::TCP:
             strategy = std::make_unique<tcpSocketStrategy>();
             break;
@@ -52,7 +54,8 @@ bool socketManager::init(Protocol protocol, const std::string& host, uint16_t po
 
 ssize_t socketManager::send(const void* data, size_t len)
 {
-    if (strategy) {
+    if (strategy)
+    {
         return strategy->send(data, len);
     }
     return -1;
@@ -60,7 +63,8 @@ ssize_t socketManager::send(const void* data, size_t len)
 
 ssize_t socketManager::receive(void* buffer, size_t maxLen)
 {
-    if (strategy) {
+    if (strategy)
+    {
         return strategy->receive(buffer, maxLen);
     }
     return -1;
@@ -68,7 +72,8 @@ ssize_t socketManager::receive(void* buffer, size_t maxLen)
 
 void socketManager::shutdown()
 {
-    if (strategy) {
+    if (strategy)
+    {
         strategy->disconnect();
         strategy.reset();
     }

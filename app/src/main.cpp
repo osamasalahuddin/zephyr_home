@@ -16,7 +16,6 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
@@ -27,6 +26,7 @@ LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
 #include "myLogger.h"
 #include "networkManager.hpp"
 #include "networkTimeManager.hpp"
+#include "socketManager.hpp"
 
 #define STACK_SIZE      (4096)
 #define TASK_PRIORITY   (-1)
@@ -63,7 +63,18 @@ int main(void)
     /* Initialize Network Manager */
     networkManager& network = networkManager::getInstance();
     network.init();
-    networkTimeManager& ntp = networkTimeManager::getInstance();
+    socketManager& socket = socketManager::instance();
+    bool isSocket = false;
+
+    bool ret = socket.init(socketManager::Protocol::UDP,
+                           network.getLocalServer().c_str(),
+                           portConfig::PORT_TEMP_SENSOR);
+    if (!ret)
+    {
+        MYLOG("Socket Initialization Failed: %d", ret);
+    }
+
+    isSocket = ret;
 
     uint64_t start = k_uptime_get();
 
@@ -84,6 +95,10 @@ int main(void)
                 if (network.isConnectedLAN())
                 {
                     MYLOG(" 💻 Connected to LAN");
+                    if (isSocket)
+                    {
+                        MYLOG("Sent Data to local server. Return: %d", socket.send("LAN", 4));
+                    }
                 }
                 else
                 {
