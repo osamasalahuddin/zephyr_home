@@ -36,11 +36,17 @@ target_sources(app PRIVATE src/managerFactory/managerFactory.cpp)
 # Network Manager
 target_sources(app PRIVATE src/networkManager/networkManager.cpp)
 
-# Network Manager
+# Network Time Manager
 target_sources(app PRIVATE src/networkTimeManager/networkTimeManager.cpp)
 
 # Ping Manager
 target_sources(app PRIVATE src/pingManager/pingManager.cpp)
+
+# Sensor Manager
+target_sources(app PRIVATE src/sensorManager/sensorManager.cpp)
+
+# Sensors
+target_sources(app PRIVATE src/sensors/temperatureSensor.cpp)
 
 # Socket Manager
 target_sources(app PRIVATE src/socketManager/socketManager.cpp)
@@ -74,6 +80,12 @@ target_include_directories(app PRIVATE src/networkTimeManager)
 
 # Ping Manager
 target_include_directories(app PRIVATE src/pingManager)
+
+# Sensor Manager
+target_include_directories(app PRIVATE src/sensorManager)
+
+# Sensors
+target_include_directories(app PRIVATE src/sensors)
 
 # Socket Manager
 target_include_directories(app PRIVATE src/socketManager)
