@@ -23,6 +23,7 @@
 #include "iManager.hpp"
 #include "wifiManager.hpp"
 #include "pingManager.hpp"
+#include "portConfig.hpp"
 
 /**
  * @class networkManager
@@ -52,6 +53,12 @@ public:
      * @return Name of the manager.
      */
     const char* name() const override;
+
+    /**
+     * @brief Get the address of the local server.
+     * @return std::string name of the local server.
+     */
+    std::string getLocalServer();
 
     /**
      * @brief Get if the network is connected to LAN.
