@@ -158,6 +158,14 @@ const char* networkManager::name() const
     return "networkManager";
 }
 
+/**
+ * @brief Get the address of the local server.
+ * @return std::string name of the local server.
+ */
+std::string networkManager::getLocalServer()
+{
+    return CONFIG_MY_LOCAL;
+}
 
 /**
  * @brief Get if the network is connected to LAN.
