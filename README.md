@@ -143,3 +143,121 @@ other output formats other than HTML by running ``make help``.
 ## 📘 UML Class Diagram
 
 ![UML Class Diagram](doc/assets/app_full_uml_diagram.png)
+
+
+## 📘 Mermaid Class Diagram
+
+```mermaid
+classDiagram
+    class main {
+        +main()
+    }
+
+    class wifiManager {
+        +connect()
+        +disconnect()
+    }
+
+    class wifiStateMachine {
+        +setState()
+        +handle()
+    }
+
+    class wifiState
+    class wifiStateIdle
+    class wifiStateConnecting
+    class wifiStateConnected
+    class wifiStateError
+
+    wifiManager --> wifiStateMachine
+    wifiStateMachine --> wifiState
+    wifiState <|-- wifiStateIdle
+    wifiState <|-- wifiStateConnecting
+    wifiState <|-- wifiStateConnected
+    wifiState <|-- wifiStateError
+
+    class pingManager {
+        +send_ping()
+    }
+
+    class networkManager {
+        +init()
+        +monitor()
+        +getInterface()
+    }
+
+    networkManager --> pingManager
+    networkManager --> wifiManager
+
+    class socketManager {
+        +open()
+        +send()
+        +close()
+    }
+
+    class socketStrategy {
+        +connect()
+        +send()
+        +close()
+    }
+
+    class udpSocketStrategy
+    class tcpSocketStrategy
+    class tlsSocketStrategy
+
+    socketStrategy <|-- udpSocketStrategy
+    socketStrategy <|-- tcpSocketStrategy
+    socketStrategy <|-- tlsSocketStrategy
+    socketManager --> socketStrategy
+
+    class sockets {
+        -socketManager* pSocketManager
+        -std::string host
+        -uint16_t port
+        -protocol proto
+        +open()
+        +send()
+        +close()
+    }
+    sockets --> socketManager
+
+    class sensorManager {
+        +init()
+        +readSensors()
+        +sendData()
+    }
+
+    class sensor {
+        +read()
+        +getName()
+    }
+
+    sensorManager --> sensor
+
+    class lightSensor {
+        +read()
+        +getLux()
+    }
+
+    class temperatureSensor {
+        +read()
+        +getCelsius()
+    }
+
+    sensor <|-- lightSensor
+    sensor <|-- temperatureSensor
+
+    class networkTimeManager {
+        +syncTime()
+    }
+
+    class sntpClient
+
+    networkTimeManager --> sntpClient
+    networkTimeManager --> networkManager
+
+    main --> socketManager
+    main --> sensorManager
+    main --> networkManager
+    main --> networkTimeManager
+    main --> sockets
