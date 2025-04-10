@@ -143,6 +143,19 @@ other output formats other than HTML by running ``make help``.
 
 ## 📘 Mermaid Class Diagram
 
+
+### ✅ Color Legend
+
+| Color        | Category       |
+|--------------|----------------|
+| 🟦 Blue       | WiFi subsystem |
+| 🟨 Yellow     | Socket system  |
+| 🟩 Green      | Sensor system  |
+| 🩷 Pink       | Time sync      |
+| ⚪ Gray       | Core entry & infra |
+
+
+## 📘 UML Class Diagram
 ```mermaid
 classDiagram
     class main {
@@ -228,8 +241,6 @@ classDiagram
         +getName()
     }
 
-    sensorManager --> sensor
-
     class lightSensor {
         +read()
         +getLux()
@@ -240,6 +251,7 @@ classDiagram
         +getCelsius()
     }
 
+    sensorManager --> sensor
     sensor <|-- lightSensor
     sensor <|-- temperatureSensor
 
@@ -252,3 +264,17 @@ classDiagram
     main --> networkManager
     main --> networkTimeManager
     main --> sockets
+
+    %% === COLOR SCHEMES ===
+    classDef WiFi fill:#D0E8FF,stroke:#003366,stroke-width:2;
+    classDef Socket fill:#FFF4D6,stroke:#A67C00,stroke-width:2;
+    classDef Sensor fill:#E1F8DC,stroke:#228B22,stroke-width:2;
+    classDef Time fill:#F5D0E8,stroke:#C71585,stroke-width:2;
+    classDef Core fill:#E6E6E6,stroke:#000000,stroke-width:1;
+
+    %% === Apply styles ===
+    class wifiManager,wifiStateMachine,wifiState,wifiStateIdle,wifiStateConnecting,wifiStateConnected,wifiStateError WiFi
+    class socketManager,socketStrategy,udpSocketStrategy,tcpSocketStrategy,tlsSocketStrategy,sockets Socket
+    class sensorManager,sensor,lightSensor,temperatureSensor Sensor
+    class networkTimeManager Time
+    class main,networkManager,pingManager Core
