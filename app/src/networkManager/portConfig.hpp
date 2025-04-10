@@ -25,15 +25,15 @@ namespace portConfig
 {
 
     /* Sensor data upload port (TCP) */
-    constexpr int PORT_TEMP_SENSOR   = 5000;
+    constexpr int PORT_TEMP_SENSOR   = 50000;
 
     /* Device control port (TCP) */
-    constexpr int DEVICE_CONTROL     = 5001;
+    constexpr int DEVICE_CONTROL     = 50001;
 
     /* Time sync proxy service (if applicable) */
-    constexpr int TIME_SYNC_PROXY    = 5002;
+    constexpr int TIME_SYNC_PROXY    = 50002;
 
     /* Reserved for future use */
-    constexpr int DEBUG_CONSOLE      = 5050;
+    constexpr int DEBUG_CONSOLE      = 50050;
 
 } // namespace portConfig
