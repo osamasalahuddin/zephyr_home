@@ -18,7 +18,7 @@
  */
 
 #include "networkManager.hpp"
-#include "myLogger.h"
+#include "myLogger.hpp"
 
 /**
  * @brief Get the singleton instance of the networkManager class.
@@ -37,7 +37,7 @@ networkManager& networkManager::getInstance()
 networkManager::networkManager():
                 ping(pingManager::getInstance()),
                 wifi(wifiManager::getInstance()),
-                WIFI_START_DELAY(500U),
+                WIFI_START_DELAY(1500U),
                 WIFI_CONNECT_TIMEOUT(120000U),
                 CONFIG_MY_LOCAL(MY_LOCAL),
                 CONFIG_MY_REMOTE(MY_REMOTE),
@@ -60,8 +60,8 @@ void networkManager::init()
 
     ping.init();
 
-    int64_t start = k_uptime_get();
-    uint8_t ticks = 0;
+    start = k_uptime_get();
+    ticks = 0;
 
     MYLOG("NetworkManager initialized");
 }
@@ -77,7 +77,7 @@ void networkManager::tick()
 
     if (wifiStateEnum::IDLE == wifiState)
     {
-        /* If 500ms have passed we can connect using Wifi */
+        /* If 1500ms have passed we can connect using Wifi */
         if ((k_uptime_get() - start > WIFI_START_DELAY) && !isConnectRequested)
         {
             MYLOG("Waiting for Wifi to connect");

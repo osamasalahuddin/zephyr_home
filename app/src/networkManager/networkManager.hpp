@@ -117,7 +117,7 @@ private:
 
     /**
      * @brief Wait time before starting of the Wifi SM
-     * @note This is set to 500ms
+     * @note This is set to 1500ms
      */
     const uint16_t WIFI_START_DELAY;
 
