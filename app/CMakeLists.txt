@@ -52,6 +52,9 @@ target_sources(app PRIVATE src/sensorManager/sensorManager.cpp)
 target_sources(app PRIVATE src/sensors/temperatureSensor.cpp)
 target_sources(app PRIVATE src/sensors/lightSensor.cpp)
 
+# Socket
+target_sources(app PRIVATE src/sockets/sockets.cpp)
+
 # Socket Manager
 target_sources(app PRIVATE src/socketManager/socketManager.cpp)
 
@@ -93,6 +96,9 @@ target_include_directories(app PRIVATE src/sensorManager)
 
 # Sensors
 target_include_directories(app PRIVATE src/sensors)
+
+# Sockets
+target_include_directories(app PRIVATE src/sockets)
 
 # Socket Manager
 target_include_directories(app PRIVATE src/socketManager)
