@@ -23,7 +23,7 @@
 
 LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
 
-#include "myLogger.h"
+#include "myLogger.hpp"
 
 #include "networkManager.hpp"
 #include "networkTimeManager.hpp"
@@ -71,9 +71,12 @@ int main(void)
 
     /* Initialize Network Manager */
     networkManager& network = networkManager::getInstance();
-    network.init();
+    myLogger& logger = myLogger::getInstance();
 
-    socketManager& socket = socketManager::instance();
+    network.init();
+    logger.init();
+
+    socketManager& socket = socketManager::getInstance();
     bool isSocket = false;
 
     bool ret = socket.init(socketManager::Protocol::UDP,

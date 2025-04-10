@@ -30,6 +30,9 @@ project(app)
 # Main
 target_sources(app PRIVATE src/main.cpp)
 
+# My Logger
+target_sources(app PRIVATE src/myLogger/myLogger.cpp)
+
 # Manager Factory
 target_sources(app PRIVATE src/managerFactory/managerFactory.cpp)
 
@@ -47,6 +50,7 @@ target_sources(app PRIVATE src/sensorManager/sensorManager.cpp)
 
 # Sensors
 target_sources(app PRIVATE src/sensors/temperatureSensor.cpp)
+target_sources(app PRIVATE src/sensors/lightSensor.cpp)
 
 # Socket Manager
 target_sources(app PRIVATE src/socketManager/socketManager.cpp)
@@ -71,6 +75,9 @@ target_sources(app PRIVATE src/wifiSM/wifiStateIdle.cpp)
 # zephyr_syscall_include_directories(./../include/app/drivers/)
 # zephyr_include_directories(./../include)
 # zephyr_include_directories(./../include/app/drivers/)
+
+# My Logger
+target_include_directories(app PRIVATE src/myLogger)
 
 # Network Manager
 target_include_directories(app PRIVATE src/networkManager)
@@ -99,7 +106,7 @@ target_include_directories(app PRIVATE src/wifiSM)
 target_include_directories(app PRIVATE ./../include/)
 target_include_directories(app PRIVATE ./../include/app/)
 target_include_directories(app PRIVATE ./../include/app/drivers)
-target_include_directories(app PRIVATE ./../include/utils/myLogger)
+# target_include_directories(app PRIVATE ./../include/utils/myLogger)
 
 #-------------------------------------------
 # System Calls Header Files
