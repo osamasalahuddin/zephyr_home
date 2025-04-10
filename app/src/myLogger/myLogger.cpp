@@ -21,6 +21,8 @@
 #include "networkManager.hpp"
 #include "socketManager.hpp"
 
+char __mylog_msg[LOG_MSG_LENGTH];
+
 static networkManager& dbgNetwork = networkManager::getInstance();;
 static socketManager& dbgSocket = socketManager::getInstance();
 
@@ -40,8 +42,8 @@ void myLogger::init()
 {
     /* If already connected to Wifi */
 
-    isSocket = dbgSocket.init(socketManager::Protocol::UDP,
-                            dbgNetwork.getLocalServer().c_str(),
+    isSocket = dbgSocket.open(socketManager::protocol::UDP,
+                            dbgNetwork.getLocalServer(),
                             portConfig::DEBUG_CONSOLE);
     if (!isSocket)
     {
@@ -53,6 +55,6 @@ void myLogger::send(const char* log_msg, size_t len)
 {
     if (dbgNetwork.isNetworkUp())
     {
-        dbgSocket.send(log_msg, len);
+        dbgSocket.send(portConfig::DEBUG_CONSOLE, log_msg, len);
     }
 }

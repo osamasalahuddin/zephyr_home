@@ -21,6 +21,7 @@
 #include "lightSensor.hpp"
 // #include "humiditySensor.hpp"
 // #include "pressureSensor.hpp"
+#include "portConfig.hpp"
 
 #include "sensorManager.hpp"
 #include "socketManager.hpp"
@@ -37,6 +38,6 @@ void sensorManager::poll_all()
     {
         float value = sensor->get_value();
         std::string payload = std::string(sensor->get_id()) + ":" + std::to_string(value);
-        socketManager::getInstance().send(payload.c_str(), payload.length());
+        socketManager::getInstance().send(portConfig::PORT_TEMP_SENSOR ,payload.c_str(), payload.length());
     }
 }

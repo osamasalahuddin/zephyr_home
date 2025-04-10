@@ -31,7 +31,7 @@
 // #define NET_LOG_MSG_LENGTH 1024
 
 // static char __netlog_msg[NET_LOG_MSG_LENGTH];
-static char __mylog_msg[LOG_MSG_LENGTH];
+extern char __mylog_msg[LOG_MSG_LENGTH];
 
 class myLogger
 {

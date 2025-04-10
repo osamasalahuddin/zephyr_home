@@ -79,7 +79,7 @@ int main(void)
     socketManager& socket = socketManager::getInstance();
     bool isSocket = false;
 
-    bool ret = socket.init(socketManager::Protocol::UDP,
+    bool ret = socket.open(socketManager::protocol::UDP,
                            network.getLocalServer().c_str(),
                            portConfig::PORT_TEMP_SENSOR);
     if (!ret)
@@ -111,7 +111,7 @@ int main(void)
                     MYLOG(" 💻 Connected to LAN");
                     if (isSocket)
                     {
-                        MYLOG("Sent Data to local server. Return: %d", socket.send("LAN", 4));
+                        MYLOG("Sent Data to local server. Return: %d", socket.send(portConfig::PORT_TEMP_SENSOR, "LAN", 4));
                     }
                 }
                 else
