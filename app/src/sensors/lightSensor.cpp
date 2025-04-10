@@ -56,7 +56,7 @@ void lightSensor::tick()
     lux = read_value();
     if (lux >= 0.0f)
     {
-        MYLOG("📸 Light: %.2f lux", lux);
+        MYLOG("📸 Light: %.2f lux", (double)lux);
     }
 }
 

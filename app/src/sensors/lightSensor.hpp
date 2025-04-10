@@ -54,7 +54,7 @@ private:
      */
     float read_value() override;
 
-    const struct device* dev;
-
     float lux;
+
+    const struct device* dev;
 };
