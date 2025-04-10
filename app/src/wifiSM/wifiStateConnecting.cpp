@@ -24,7 +24,7 @@
 
 #include "wifiStateImp.hpp"
 #include "wifiContext.hpp"
-#include "myLogger.h"
+#include "myLogger.hpp"
 
 
 wifiStateConnecting::wifiStateConnecting(wifiStateConnected* next): connected(next)
@@ -52,6 +52,7 @@ void wifiStateConnecting::enter(wifiContext& ctx, net_if* _iface)
         .security = WIFI_SECURITY_TYPE_PSK,
     };
 
+    MYLOG("Sending Connection Request");
     int ret = net_mgmt(NET_REQUEST_WIFI_CONNECT, iface, &params, sizeof(params));
 
     if (ret)

@@ -18,7 +18,7 @@
  */
 
 #include "pingManager.hpp"
-#include "myLogger.h"
+#include "myLogger.hpp"
 #include <cstring>
 #include <algorithm>
 
