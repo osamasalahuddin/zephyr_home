@@ -140,10 +140,6 @@ make html
 The output will be stored in the ``_build_sphinx`` folder. You may check for
 other output formats other than HTML by running ``make help``.
 
-## 📘 UML Class Diagram
-
-![UML Class Diagram](doc/assets/app_full_uml_diagram.png)
-
 
 ## 📘 Mermaid Class Diagram
 
@@ -250,11 +246,6 @@ classDiagram
     class networkTimeManager {
         +syncTime()
     }
-
-    class sntpClient
-
-    networkTimeManager --> sntpClient
-    networkTimeManager --> networkManager
 
     main --> socketManager
     main --> sensorManager
