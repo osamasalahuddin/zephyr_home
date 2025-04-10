@@ -23,14 +23,21 @@
 #include <string>
 
 #include "sensor.hpp"
+#include "sockets.hpp"
 
 class sensorManager
 {
 public:
-    void add_sensor(sensor* sensor);
+    void add_sensor(sensor* sensor, sockets* socket);
 
     void poll_all();
-
 private:
-    std::vector<sensor*> sensors;
+
+    struct _sensor
+    {
+        sensor* _sensor;
+        sockets* _socket;
+    };
+
+    std::vector<_sensor> sensors;
 };

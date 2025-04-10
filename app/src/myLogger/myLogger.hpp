@@ -67,10 +67,10 @@ public:
                                                                         \
     /* Format and print the log message */                              \
     int __len = snprintf(__mylog_msg, sizeof(__mylog_msg),              \
-        "[%02lld:%02lld:%02lld.%03lld] %s:%d - " fmt "\n",              \
+        "[%02lld:%02lld:%02lld.%03lld] %s:%d - " fmt ,                  \
         __hours, __minutes, __seconds, __milliseconds,                  \
         __short_file, __LINE__, ##__VA_ARGS__);                         \
-    printk("%s", __mylog_msg);                                          \
+    printk("%s\n", __mylog_msg);                                        \
     myLogger::getInstance().send(__mylog_msg, __len);                   \
         \
 } while (0);

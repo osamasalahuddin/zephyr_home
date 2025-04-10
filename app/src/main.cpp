@@ -28,6 +28,7 @@ LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
 #include "networkManager.hpp"
 #include "networkTimeManager.hpp"
 #include "socketManager.hpp"
+#include "sockets.hpp"
 
 #include "sensorManager.hpp"
 #include "lightSensor.hpp"
@@ -67,21 +68,27 @@ int main(void)
     lightSensor lightSensor;
     sensorManager sensorMgr;
 
-    sensorMgr.add_sensor(&lightSensor);
+    sockets socketTempSensor;
+    sockets socketLightSensor;
 
-    /* Initialize Network Manager */
     networkManager& network = networkManager::getInstance();
     myLogger& logger = myLogger::getInstance();
 
+    sensorMgr.add_sensor(&lightSensor, &socketLightSensor);
+
+    socketLightSensor.open(networkManager::getInstance().getLocalServer(),
+                           portConfig::DEVICE_CONTROL,
+                           socketManager::protocol::UDP);
+
+    /* Initialize Network Manager */
     network.init();
     logger.init();
 
-    socketManager& socket = socketManager::getInstance();
     bool isSocket = false;
 
-    bool ret = socket.open(socketManager::protocol::UDP,
-                           network.getLocalServer().c_str(),
-                           portConfig::PORT_TEMP_SENSOR);
+    bool ret = socketTempSensor.open(network.getLocalServer(),
+                           portConfig::PORT_TEMP_SENSOR,
+                           socketManager::protocol::UDP);
     if (!ret)
     {
         MYLOG("Socket Initialization Failed: %d", ret);
@@ -111,7 +118,8 @@ int main(void)
                     MYLOG(" 💻 Connected to LAN");
                     if (isSocket)
                     {
-                        MYLOG("Sent Data to local server. Return: %d", socket.send(portConfig::PORT_TEMP_SENSOR, "LAN", 4));
+                        MYLOG("Sent Data to local server. Return: %d",
+                                socketTempSensor.send("LAN", 4));
                     }
                 }
                 else

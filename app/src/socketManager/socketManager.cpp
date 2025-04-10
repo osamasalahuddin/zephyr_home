@@ -38,19 +38,22 @@ socketManager& socketManager::getInstance()
 
 bool socketManager::open(protocol proto, const std::string& host, uint16_t port)
 {
-    auto key = std::make_tuple(proto, port);
+    auto key = std::make_tuple(proto, host, port);
     bool ret = false;
 
     if (sockets.find(key) != sockets.end())
     {
-        MYLOG("Socket already open for protocol %d port %d on Host %s", (int)proto, port, host);
+        MYLOG("Socket already open for protocol %d port %d on Host %s",
+                (int)proto, port, host.c_str());
     }
     else
     {
         auto strategy = createStrategy(proto, port);
         if (strategy && strategy->connect(host, port))
         {
+            /* Store it in the socket list */
             sockets[key] = std::move(strategy);
+
             MYLOG("Opened %d socket on port %d", (int)proto, port);
             ret = true;
         }
@@ -62,19 +65,18 @@ bool socketManager::open(protocol proto, const std::string& host, uint16_t port)
     return ret;
 }
 
-ssize_t socketManager::send(uint16_t port ,const void* data, size_t len)
+ssize_t socketManager::send(std::string& host, protocol proto, uint16_t port ,const void* data, size_t len)
 {
     int ret = -1;
 
-    /* Search for a socket by port only (regardless of protocol) */
-    for (const auto& [key, strategy] : sockets)
+    auto key = std::make_tuple(proto, host, port);
+
+    auto it = sockets.find(key);
+    if (it != sockets.end())
     {
-        if (std::get<1>(key) == port)
-        {
-            ret = strategy->send(data, len);
-        }
+        ret = it->second->send(data, len);
     }
-    if (ret < 0)
+    else
     {
         MYLOG("No socket open for port %d",  port);
     }

@@ -42,14 +42,15 @@ public:
     bool open(protocol proto, const std::string& host, uint16_t port);
     void close(protocol proto, uint16_t port);
 
-    ssize_t send(uint16_t port, const void* data, size_t len);
+    ssize_t send(std::string& host, protocol proto, uint16_t port, const void* data, size_t len);
     ssize_t receive(void* buffer, size_t maxLen);
     void shutdown();
 
 private:
     socketManager() = default;
 
-    std::map<std::tuple<protocol, uint16_t>, std::unique_ptr<socketStrategy>> sockets;
+    using SocketKey = std::tuple<protocol, std::string, uint16_t>;
+    std::map<SocketKey, std::unique_ptr<socketStrategy>> sockets;
 
     std::unique_ptr<socketStrategy> createStrategy(protocol proto, uint16_t port);
 
