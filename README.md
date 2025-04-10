@@ -141,7 +141,7 @@ The output will be stored in the ``_build_sphinx`` folder. You may check for
 other output formats other than HTML by running ``make help``.
 
 
-## 📘 Mermaid Class Diagram
+## 📘 UML Class Diagram
 
 
 ### ✅ Color Legend
@@ -155,7 +155,6 @@ other output formats other than HTML by running ``make help``.
 | ⚪ Gray       | Core entry & infra |
 
 
-## 📘 UML Class Diagram
 ```mermaid
 classDiagram
     class main {
@@ -265,16 +264,30 @@ classDiagram
     main --> networkTimeManager
     main --> sockets
 
-    %% === COLOR SCHEMES ===
-    classDef WiFi fill:#D0E8FF,stroke:#003366,stroke-width:2;
-    classDef Socket fill:#FFF4D6,stroke:#A67C00,stroke-width:2;
-    classDef Sensor fill:#E1F8DC,stroke:#228B22,stroke-width:2;
-    classDef Time fill:#F5D0E8,stroke:#C71585,stroke-width:2;
-    classDef Core fill:#E6E6E6,stroke:#000000,stroke-width:1;
+    %% Color using style for classDiagram
+    style wifiManager fill:#D0E8FF,stroke:#003366,color:#000000
+    style wifiStateMachine fill:#D0E8FF,stroke:#003366,color:#000000
+    style wifiState fill:#D0E8FF,stroke:#003366,color:#000000
+    style wifiStateIdle fill:#D0E8FF,stroke:#003366,color:#000000
+    style wifiStateConnecting fill:#D0E8FF,stroke:#003366,color:#000000
+    style wifiStateConnected fill:#D0E8FF,stroke:#003366,color:#000000
+    style wifiStateError fill:#D0E8FF,stroke:#003366,color:#000000
 
-    %% === Apply styles ===
-    class wifiManager,wifiStateMachine,wifiState,wifiStateIdle,wifiStateConnecting,wifiStateConnected,wifiStateError WiFi
-    class socketManager,socketStrategy,udpSocketStrategy,tcpSocketStrategy,tlsSocketStrategy,sockets Socket
-    class sensorManager,sensor,lightSensor,temperatureSensor Sensor
-    class networkTimeManager Time
-    class main,networkManager,pingManager Core
+    style socketManager fill:#FFF4D6,stroke:#A67C00,color:#000000
+    style socketStrategy fill:#FFF4D6,stroke:#A67C00,color:#000000
+    style udpSocketStrategy fill:#FFF4D6,stroke:#A67C00,color:#000000
+    style tcpSocketStrategy fill:#FFF4D6,stroke:#A67C00,color:#000000
+    style tlsSocketStrategy fill:#FFF4D6,stroke:#A67C00,color:#000000
+    style sockets fill:#FFF4D6,stroke:#A67C00,color:#000000
+
+    style sensorManager fill:#E1F8DC,stroke:#228B22,color:#000000
+    style sensor fill:#E1F8DC,stroke:#228B22,color:#000000
+    style lightSensor fill:#E1F8DC,stroke:#228B22,color:#000000
+    style temperatureSensor fill:#E1F8DC,stroke:#228B22,color:#000000
+
+    style networkTimeManager fill:#F5D0E8,stroke:#C71585,color:#000000
+    style sntpClient fill:#F5D0E8,stroke:#C71585,color:#000000
+
+    style main fill:#E6E6E6,stroke:#000000,color:#000000
+    style networkManager fill:#E6E6E6,stroke:#000000,color:#000000
+    style pingManager fill:#E6E6E6,stroke:#000000,color:#000000
