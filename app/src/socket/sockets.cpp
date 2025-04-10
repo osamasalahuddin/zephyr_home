@@ -1,7 +1,7 @@
 /*
  * This file is part of the Zephyr Home project.
  *
- * Copyright (C) 2025 Osama Salah-ud-Din
+ * Copyright (C) 2024 Osama Salah-ud-din
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,29 +15,38 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
-#pragma once
-
-#include <vector>
-#include <string>
-
-#include "sensor.hpp"
 #include "sockets.hpp"
 
-class sensorManager
+sockets::sockets()
 {
-public:
-    void add_sensor(sensor* sensor, sockets* socket);
+    pSocketManager = &socketManager::getInstance();
+    host = "0";
+    port = 0;
+    proto = socketManager::protocol::UDP;
+}
 
-    void poll_all();
-private:
+sockets::~sockets()
+{
+    close();
+}
 
-    struct _sensor
-    {
-        sensor* _sensor;
-        sockets* _socket;
-    };
+bool sockets::open(std::string server, uint16_t _port, socketManager::protocol protocol)
+{
+    /* Save the parameters */
+    host = server;
+    port = _port;
+    proto = protocol;
+    return pSocketManager->open(proto, host, port);
+}
 
-    std::vector<_sensor> sensors;
-};
+void sockets::close()
+{
+
+}
+
+uint32_t sockets::send(const char* data, size_t len)
+{
+    return pSocketManager->send(host, proto, port, data, len);
+}

@@ -24,7 +24,7 @@
 
 #include "wifiStateImp.hpp"
 #include "wifiContext.hpp"
-#include "myLogger.h"
+#include "myLogger.hpp"
 
 
 wifiStateConnecting::wifiStateConnecting(wifiStateConnected* next): connected(next)
@@ -46,12 +46,13 @@ void wifiStateConnecting::enter(wifiContext& ctx, net_if* _iface)
     struct wifi_connect_req_params params =
     {
         .ssid = (const uint8_t*) CONFIG_WIFI_SSID.c_str(),
-        .ssid_length = CONFIG_WIFI_SSID.length(),
-        .psk = (const uint8_t*) (CONFIG_WIFI_PASSWORD.c_str()),
-        .psk_length = CONFIG_WIFI_PASSWORD.length(),
+        .ssid_length = (uint8_t) CONFIG_WIFI_SSID.length(),
+        .psk = (const uint8_t*) CONFIG_WIFI_PASSWORD.c_str(),
+        .psk_length = (uint8_t) CONFIG_WIFI_PASSWORD.length(),
         .security = WIFI_SECURITY_TYPE_PSK,
     };
 
+    MYLOG("Sending Connection Request");
     int ret = net_mgmt(NET_REQUEST_WIFI_CONNECT, iface, &params, sizeof(params));
 
     if (ret)

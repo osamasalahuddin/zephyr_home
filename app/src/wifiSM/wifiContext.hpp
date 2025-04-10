@@ -18,7 +18,7 @@
  */
 #pragma once
 #include "wifiState.hpp"
-#include "myLogger.h"
+#include "myLogger.hpp"
 
 #include <zephyr/net/net_if.h>
 #include <zephyr/net/wifi_mgmt.h>

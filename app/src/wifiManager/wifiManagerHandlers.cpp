@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "wifiManager.hpp"
-#include "myLogger.h"
+#include "myLogger.hpp"
 #include "wifi.h"
 
 static K_SEM_DEFINE(ipv4_address_obtained, 0, 1);

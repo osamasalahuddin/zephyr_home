@@ -18,7 +18,7 @@
  */
 #include "wifiManager.hpp"
 #include "managerFactory.hpp"
-#include "myLogger.h"
+#include "myLogger.hpp"
 
 #include <zephyr/net/wifi_mgmt.h>
 /* Anonymous namespace limits the visibility of `registered` to this file only,

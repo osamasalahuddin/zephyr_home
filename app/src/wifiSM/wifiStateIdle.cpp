@@ -19,7 +19,7 @@
 
 #include "wifiStateImp.hpp"
 #include "wifiContext.hpp"
-#include "myLogger.h"
+#include "myLogger.hpp"
 #include <zephyr/net/wifi_mgmt.h>
 #include <zephyr/net/net_mgmt.h>
 
