@@ -17,9 +17,12 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+#include <memory>
+
 #include "socketManager.hpp"
 #include "socketStrategy.hpp"
-#include <memory>
+
+#include "myLogger.hpp"
 
 static socketManager* instance_ptr = nullptr;
 
@@ -33,32 +36,50 @@ socketManager& socketManager::getInstance()
     return *instance_ptr;
 }
 
-bool socketManager::init(Protocol protocol, const std::string& host, uint16_t port)
+bool socketManager::open(protocol proto, const std::string& host, uint16_t port)
 {
-    switch (protocol)
+    auto key = std::make_tuple(proto, port);
+    bool ret = false;
+
+    if (sockets.find(key) != sockets.end())
     {
-        case Protocol::TCP:
-            strategy = std::make_unique<tcpSocketStrategy>();
-            break;
-        case Protocol::UDP:
-            strategy = std::make_unique<udpSocketStrategy>();
-            break;
-        case Protocol::TLS:
-            strategy = std::make_unique<tlsSocketStrategy>();
-            break;
-        default:
-            return false;
+        MYLOG("Socket already open for protocol %d port %d on Host %s", (int)proto, port, host);
     }
-    return strategy->connect(host, port);
+    else
+    {
+        auto strategy = createStrategy(proto, port);
+        if (strategy && strategy->connect(host, port))
+        {
+            sockets[key] = std::move(strategy);
+            MYLOG("Opened %d socket on port %d", (int)proto, port);
+            ret = true;
+        }
+        else
+        {
+            MYLOG("Failed to open %d socket on port %d", (int)proto, port);
+        }
+    }
+    return ret;
 }
 
-ssize_t socketManager::send(const void* data, size_t len)
+ssize_t socketManager::send(uint16_t port ,const void* data, size_t len)
 {
-    if (strategy)
+    int ret = -1;
+
+    /* Search for a socket by port only (regardless of protocol) */
+    for (const auto& [key, strategy] : sockets)
     {
-        return strategy->send(data, len);
+        if (std::get<1>(key) == port)
+        {
+            ret = strategy->send(data, len);
+        }
     }
-    return -1;
+    if (ret < 0)
+    {
+        MYLOG("No socket open for port %d",  port);
+    }
+
+    return ret;
 }
 
 ssize_t socketManager::receive(void* buffer, size_t maxLen)
@@ -76,5 +97,21 @@ void socketManager::shutdown()
     {
         strategy->disconnect();
         strategy.reset();
+    }
+}
+
+std::unique_ptr<socketStrategy> socketManager::createStrategy(socketManager::protocol proto, uint16_t port)
+{
+    switch (proto)
+    {
+        case protocol::TCP:
+            return std::make_unique<tcpSocketStrategy>();
+        case protocol::UDP:
+            return std::make_unique<udpSocketStrategy>();
+        case protocol::TLS:
+            return std::make_unique<tlsSocketStrategy>();
+        default:
+            MYLOG("Unknown protocol type: %d", proto);
+            return nullptr;
     }
 }
