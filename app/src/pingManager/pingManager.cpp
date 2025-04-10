@@ -149,7 +149,7 @@ int pingManager::handle_reply(struct net_icmp_ctx* ctx, struct net_pkt* pkt,
 
     if (it != instance_ptr->pending_requests.end())
     {
-        int64_t end_time = k_uptime_get() - it->start_time;
+        // int64_t end_time = k_uptime_get() - it->start_time;
         // MYLOG("✅ Received ping reply from %s %lldms", addr_str, end_time);
 
         /* Call the callback if provided */
