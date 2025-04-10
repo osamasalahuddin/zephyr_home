@@ -37,6 +37,6 @@ void sensorManager::poll_all()
     {
         float value = sensor->get_value();
         std::string payload = std::string(sensor->get_id()) + ":" + std::to_string(value);
-        socketManager::instance().send(payload.c_str(), payload.length());
+        socketManager::getInstance().send(payload.c_str(), payload.length());
     }
 }

@@ -33,7 +33,7 @@ public:
         TLS
     };
 
-    static socketManager& instance();
+    static socketManager& getInstance();
 
     bool init(Protocol protocol, const std::string& host, uint16_t port);
     ssize_t send(const void* data, size_t len);

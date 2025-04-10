@@ -23,7 +23,7 @@
 
 static socketManager* instance_ptr = nullptr;
 
-socketManager& socketManager::instance()
+socketManager& socketManager::getInstance()
 {
     if (!instance_ptr)
     {
