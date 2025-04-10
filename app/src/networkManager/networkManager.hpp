@@ -82,6 +82,38 @@ private:
     /** Internal Variables */
 
     /**
+     * @brief Wait time before starting of the Wifi SM
+     * @note This is set to 1500ms
+     */
+    const uint16_t WIFI_START_DELAY;
+
+    /**
+     * @brief Wait time for letting Wifi to connect to the network
+     * @note This is set to 120 seconds
+     */
+    const uint32_t WIFI_CONNECT_TIMEOUT;
+
+    /**
+     * @brief String Values gotten from build system for LAN Server
+     */
+    const std::string CONFIG_MY_LOCAL;
+
+    /**
+     * @brief String Values gotten from build system for WAN Server
+     */
+    const std::string CONFIG_MY_REMOTE;
+
+    /**
+     * @brief For Time Stamping the network connection
+     */
+    int64_t start;
+
+    /**
+     * @brief String Values gotten from build system for WAN Server
+     */
+    uint8_t ticks;
+
+    /**
      * @brief Flag to check if the network is requested to connect.
      * @note This is set to true when the network manager is requested to connect
      */
@@ -111,31 +143,6 @@ private:
      *       using the wifiManager class.
      */
     wifiStateEnum wifiState;
-
-    int64_t start;
-    uint8_t ticks;
-
-    /**
-     * @brief Wait time before starting of the Wifi SM
-     * @note This is set to 500ms
-     */
-    const uint16_t WIFI_START_DELAY;
-
-    /**
-     * @brief Wait time for letting Wifi to connect to the network
-     * @note This is set to 120 seconds
-     */
-    const uint16_t WIFI_CONNECT_TIMEOUT;
-
-    /**
-     * @brief String Values gotten from build system for LAN Server
-     */
-    const std::string CONFIG_MY_LOCAL;
-
-    /**
-     * @brief String Values gotten from build system for WAN Server
-     */
-    const std::string CONFIG_MY_REMOTE;
 
     /** WiFi instance pointer */
     wifiManager& wifi;

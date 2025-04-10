@@ -17,7 +17,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 #include "wifiStateImp.hpp"
-#include "myLogger.h"
+#include "myLogger.hpp"
 
 wifiStateError::wifiStateError(wifiStateIdle* idleState,
                                wifiStateDisconnected* disconnectedState)

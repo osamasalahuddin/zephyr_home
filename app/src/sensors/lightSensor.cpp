@@ -21,13 +21,14 @@
 #include <zephyr/drivers/sensor.h>
 
 #include "lightSensor.hpp"
-#include "myLogger.h"
+#include "myLogger.hpp"
 
 lightSensor::lightSensor():
                 lux(0.0f),
                 dev(nullptr)
 {
     // dev = DEVICE_DT_GET(DT_N_NODELABEL_mylight_sensor);
+    // dev = DEVICE_DT_GET(DT_NODELABEL(LIGHT_SENSOR));
 
     dev = device_get_binding("light_sensor");
     if (NULL == dev)
@@ -55,7 +56,7 @@ void lightSensor::tick()
     lux = read_value();
     if (lux >= 0.0f)
     {
-        MYLOG("📸 Light: %.2f lux", lux);
+        MYLOG("📸 Light: %.2f lux", (double)lux);
     }
 }
 

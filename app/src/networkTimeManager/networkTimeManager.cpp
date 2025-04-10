@@ -19,7 +19,7 @@
 
 #include "networkTimeManager.hpp"
 
-#include "myLogger.h"
+#include "myLogger.hpp"
 
 #include <zephyr/net/sntp.h>
 #include <zephyr/net/net_ip.h>

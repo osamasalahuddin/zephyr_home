@@ -19,7 +19,7 @@
 
 #include "sensorManager.hpp"
 #include "temperatureSensor.hpp"
-#include "myLogger.h"
+#include "myLogger.hpp"
 
 const char* temperatureSensor::get_id() const
 {

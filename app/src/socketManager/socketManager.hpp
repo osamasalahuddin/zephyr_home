@@ -22,25 +22,37 @@
 #include "socketStrategy.hpp"
 #include <memory>
 #include <string>
+#include <map>
 
 class socketManager
 {
 public:
-    enum class Protocol
+    enum protocol
     {
         TCP,
         UDP,
         TLS
     };
 
-    static socketManager& instance();
+    static socketManager& getInstance();
 
-    bool init(Protocol protocol, const std::string& host, uint16_t port);
-    ssize_t send(const void* data, size_t len);
+    // bool init(protocol proto, const std::string& host, uint16_t port);
+
+
+    bool open(protocol proto, const std::string& host, uint16_t port);
+    void close(protocol proto, uint16_t port);
+
+    ssize_t send(std::string& host, protocol proto, uint16_t port, const void* data, size_t len);
     ssize_t receive(void* buffer, size_t maxLen);
     void shutdown();
 
 private:
     socketManager() = default;
+
+    using SocketKey = std::tuple<protocol, std::string, uint16_t>;
+    std::map<SocketKey, std::unique_ptr<socketStrategy>> sockets;
+
+    std::unique_ptr<socketStrategy> createStrategy(protocol proto, uint16_t port);
+
     std::unique_ptr<socketStrategy> strategy;
 };

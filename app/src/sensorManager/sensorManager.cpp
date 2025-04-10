@@ -21,22 +21,23 @@
 #include "lightSensor.hpp"
 // #include "humiditySensor.hpp"
 // #include "pressureSensor.hpp"
+#include "portConfig.hpp"
 
 #include "sensorManager.hpp"
 #include "socketManager.hpp"
+#include "sockets.hpp"
 
-
-void sensorManager::add_sensor(sensor* sensor)
+void sensorManager::add_sensor(sensor* sensor, sockets* socket)
 {
-    sensors.push_back(sensor);
+    sensors.push_back({sensor, socket});
 }
 
 void sensorManager::poll_all()
 {
-    for (auto* sensor : sensors)
+    for (_sensor it : sensors)
     {
-        float value = sensor->get_value();
-        std::string payload = std::string(sensor->get_id()) + ":" + std::to_string(value);
-        socketManager::instance().send(payload.c_str(), payload.length());
+        float value = it._sensor->get_value();
+        std::string payload = std::string(it._sensor->get_id()) + ":" + std::to_string(value);
+        it._socket->send(payload.c_str(), payload.length());
     }
 }
