@@ -125,7 +125,7 @@ private:
      * @brief Wait time for letting Wifi to connect to the network
      * @note This is set to 120 seconds
      */
-    const uint16_t WIFI_CONNECT_TIMEOUT;
+    const uint32_t WIFI_CONNECT_TIMEOUT;
 
     /**
      * @brief String Values gotten from build system for LAN Server
