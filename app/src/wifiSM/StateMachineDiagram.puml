@@ -1,0 +1,16 @@
+@startuml
+
+state "WiFi State Machine" as SM {
+  [*] --> idle
+
+  idle --> scanning : handle()\n(startScan requested)
+  scanning --> connecting : handle()\n(network found)
+  connecting --> connected : handle()\n(isConnected == true)
+  connecting --> error : handle()\n(isConnected == false)
+  connected --> disconnected : handle()\n(disconnect triggered)
+  disconnected --> idle : handle()\n(reset requested)
+  error --> idle : handle()\n(retry requested)
+  error --> disconnected : handle()\n(failover triggered)
+}
+
+@enduml

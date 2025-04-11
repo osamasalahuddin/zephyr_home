@@ -35,35 +35,24 @@
 
 ## 📦 Key Components (Inside `app/src`)
 
-| Folder               | Description                                                       |
-|----------------------|-------------------------------------------------------------------|
-| `wifiManager`        | Controls Wi-Fi connection lifecycle                               |
-| `wifiSM`             | Implements a full Wi-Fi **state machine** (Idle → Connected → …) |
-| `networkManager`     | Central hub for connectivity, ping, time sync, and socket handling|
-| `socketManager`      | Opens, sends, and closes sockets by protocol + host + port        |
-| `sockets`            | Simple wrapper class for socket usage in modules                  |
-| `sensorManager`      | Manages all attached sensors and handles polling + sending        |
-| `lightSensor`        | Reads light levels from **TSL2561** over I²C                      |
-| `temperatureSensor`  | Stub for any temperature sensor (e.g., TMP117 or similar)         |
-| `networkTimeManager` | SNTP-based network time syncing                                   |
-| `pingManager`        | Sends ICMP pings and listens for replies                          |
-| `main.cpp`           | Bootstraps the system and schedules runtime behavior              |
+| Folder                                                    | Description                                                       |
+|-----------------------------------------------------------|-------------------------------------------------------------------|
+| [`wifiManager`](src/wifiManager/README.md)                | Controls Wi-Fi connection lifecycle                               |
+| [`wifiSM`](src/wifiSM/README.md)                          | Implements a full Wi-Fi **state machine** (Idle → Connected → …)  |
+| [`networkManager`](src/networkManager/README.md)          | Central hub for connectivity, ping, time sync, and socket handling|
+| [`socketManager`](src/socketManager/README.md)            | Opens, sends, and closes sockets by protocol + host + port        |
+| [`sockets`](src/sockets/README.md)                        | Simple wrapper class for socket usage in modules                  |
+| [`sensorManager`](src/sensorManager/README.md)            | Manages all attached sensors and handles polling + sending        |
+| [`lightSensor`](src/lightSensor/README.md)                | Reads light levels from **TSL2561** over I²C                      |
+| [`temperatureSensor`](src/temperatureSensor/README.md)    | Stub for any temperature sensor (e.g., TMP117 or similar)         |
+| [`networkTimeManager`](src/networkTimeManager/README.md)  | SNTP-based network time syncing                                   |
+| [`pingManager`](src/pingManager/README.md)                | Sends ICMP pings and listens for replies                          |
+| `main.cpp`                                                | Bootstraps the system and schedules runtime behavior              |
 
 ---
 
 
 ## 📘 UML Class Diagram
-
-### ✅ Color Legend
-
-| Color        | Category       |
-|--------------|----------------|
-| 🟦 Blue       | WiFi subsystem |
-| 🟨 Yellow     | Socket system  |
-| 🟩 Green      | Sensor system  |
-| 🩷 Pink       | Time sync      |
-| ⚪ Gray       | Core entry & infra |
-
 
 ```mermaid
 classDiagram
@@ -203,6 +192,16 @@ classDiagram
     style pingManager fill:#E6E6E6,stroke:#000000,color:#000000
 
 ```
+### ✅ Color Legend
+
+| Color        | Category       |
+|--------------|----------------|
+| 🟦 Blue       | WiFi subsystem |
+| 🟨 Yellow     | Socket system  |
+| 🟩 Green      | Sensor system  |
+| 🩷 Pink       | Time sync      |
+| ⚪ Gray       | Core entry & infra |
+
 
 
 ## 🛠 Board Support
