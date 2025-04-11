@@ -16,133 +16,43 @@
   <img alt="API Documentation" src="https://img.shields.io/badge/API-documentation-3D578C?logo=c&logoColor=white">
 </a>
 
-This repository contains a Zephyr example application. The main purpose of this
-repository is to serve as a reference on how to structure Zephyr-based
-applications. Some of the features demonstrated in this example are:
+# 🌐 Zephyr Home – ESP32 Smart Sensor Platform
 
-- Basic [Zephyr application][app_dev] skeleton
-- [Zephyr workspace applications][workspace_app]
-- [Zephyr modules][modules]
-- [West T2 topology][west_t2]
-- [Custom boards][board_porting]
-- Custom [devicetree bindings][bindings]
-- Out-of-tree [drivers][drivers]
-- Out-of-tree libraries
-- Example CI configuration (using GitHub Actions)
-- Custom [west extension][west_ext]
-- Custom [Zephyr runner][runner_ext]
-- Doxygen and Sphinx documentation boilerplate
+**Zephyr Home** is a modular, event-driven IoT system built on top of **Zephyr RTOS** for the **ESP32 DevKitC WROOM** board. It combines Wi-Fi management, time synchronization, sensor polling, and data transmission through sockets using clean object-oriented design and state machines.
 
-This repository is versioned together with the [Zephyr main tree][zephyr]. This
-means that every time that Zephyr is tagged, this repository is tagged as well
-with the same version number, and the [manifest](west.yml) entry for `zephyr`
-will point to the corresponding Zephyr tag. For example, the `example-application`
-v2.6.0 will point to Zephyr v2.6.0. Note that the `main` branch always
-points to the development branch of Zephyr, also `main`.
+---
 
-[app_dev]: https://docs.zephyrproject.org/latest/develop/application/index.html
-[workspace_app]: https://docs.zephyrproject.org/latest/develop/application/index.html#zephyr-workspace-app
-[modules]: https://docs.zephyrproject.org/latest/develop/modules.html
-[west_t2]: https://docs.zephyrproject.org/latest/develop/west/workspaces.html#west-t2
-[board_porting]: https://docs.zephyrproject.org/latest/guides/porting/board_porting.html
-[bindings]: https://docs.zephyrproject.org/latest/guides/dts/bindings.html
-[drivers]: https://docs.zephyrproject.org/latest/reference/drivers/index.html
-[zephyr]: https://github.com/zephyrproject-rtos/zephyr
-[west_ext]: https://docs.zephyrproject.org/latest/develop/west/extensions.html
-[runner_ext]: https://docs.zephyrproject.org/latest/develop/modules.html#external-runners
+## 🧠 What This App Does
 
-## Getting Started
+- ✅ Connects to Wi-Fi using a State Machine
+- 🕓 Syncs time from an NTP server via SNTP
+- 🌡️ Reads data from I²C-based sensors (light, temperature)
+- 📤 Sends sensor data over UDP/TCP/TLS using a pluggable socket strategy
+- 🔁 Reconnects and retries intelligently on failure
+- 📊 Logs diagnostics over console and optionally via UDP
 
-Before getting started, make sure you have a proper Zephyr development
-environment. Follow the official
-[Zephyr Getting Started Guide](https://docs.zephyrproject.org/latest/getting_started/index.html).
+---
 
-### Initialization
+## 📦 Key Components (Inside `app/src`)
 
-The first step is to initialize the workspace folder (``my-workspace``) where
-the ``example-application`` and all Zephyr modules will be cloned. Run the following
-command:
+| Folder               | Description                                                       |
+|----------------------|-------------------------------------------------------------------|
+| `wifiManager`        | Controls Wi-Fi connection lifecycle                               |
+| `wifiSM`             | Implements a full Wi-Fi **state machine** (Idle → Connected → …) |
+| `networkManager`     | Central hub for connectivity, ping, time sync, and socket handling|
+| `socketManager`      | Opens, sends, and closes sockets by protocol + host + port        |
+| `sockets`            | Simple wrapper class for socket usage in modules                  |
+| `sensorManager`      | Manages all attached sensors and handles polling + sending        |
+| `lightSensor`        | Reads light levels from **TSL2561** over I²C                      |
+| `temperatureSensor`  | Stub for any temperature sensor (e.g., TMP117 or similar)         |
+| `networkTimeManager` | SNTP-based network time syncing                                   |
+| `pingManager`        | Sends ICMP pings and listens for replies                          |
+| `main.cpp`           | Bootstraps the system and schedules runtime behavior              |
 
-```shell
-# initialize my-workspace for the example-application (main branch)
-west init -m https://github.com/zephyrproject-rtos/example-application --mr main my-workspace
-# update Zephyr modules
-cd my-workspace
-west update
-```
-
-### Building and running
-
-To build the application, run the following command:
-
-```shell
-cd example-application
-west build -b $BOARD app
-```
-
-where `$BOARD` is the target board.
-
-You can use the `custom_plank` board found in this
-repository. Note that Zephyr sample boards may be used if an
-appropriate overlay is provided (see `app/boards`).
-
-A sample debug configuration is also provided. To apply it, run the following
-command:
-
-```shell
-west build -b $BOARD app -- -DEXTRA_CONF_FILE=debug.conf
-```
-
-Once you have built the application, run the following command to flash it:
-
-```shell
-west flash
-```
-
-### Testing
-
-To execute Twister integration tests, run the following command:
-
-```shell
-west twister -T tests --integration
-```
-
-### Documentation
-
-A minimal documentation setup is provided for Doxygen and Sphinx. To build the
-documentation first change to the ``doc`` folder:
-
-```shell
-cd doc
-```
-
-Before continuing, check if you have Doxygen installed. It is recommended to
-use the same Doxygen version used in [CI](.github/workflows/docs.yml). To
-install Sphinx, make sure you have a Python installation in place and run:
-
-```shell
-pip install -r requirements.txt
-```
-
-API documentation (Doxygen) can be built using the following command:
-
-```shell
-doxygen
-```
-
-The output will be stored in the ``_build_doxygen`` folder. Similarly, the
-Sphinx documentation (HTML) can be built using the following command:
-
-```shell
-make html
-```
-
-The output will be stored in the ``_build_sphinx`` folder. You may check for
-other output formats other than HTML by running ``make help``.
+---
 
 
 ## 📘 UML Class Diagram
-
 
 ### ✅ Color Legend
 
@@ -291,3 +201,119 @@ classDiagram
     style main fill:#E6E6E6,stroke:#000000,color:#000000
     style networkManager fill:#E6E6E6,stroke:#000000,color:#000000
     style pingManager fill:#E6E6E6,stroke:#000000,color:#000000
+
+```
+
+
+## 🛠 Board Support
+
+- 🧩 Board: `esp32_devkitc_wroom/esp32`
+- 🔌 Peripherals:
+  - I²C on GPIO21 (SDA) and GPIO22 (SCL)
+  - Wi-Fi via onboard ESP32 radio
+
+---
+
+## 🧪 Example Behavior
+
+1. On boot, the system enters `Idle`
+2. Wi-Fi state machine transitions: `Idle → Connecting → Connected`
+3. Once online:
+    - Time is synced via SNTP
+    - Sensors are polled periodically
+    - Data is sent over the selected socket protocol
+4. If disconnected, it auto-retries or gracefully resets
+
+---
+
+## 🛠 Build + Flash Instructions (Zephyr SDK)
+
+Make sure you've set up Zephyr correctly with ESP32 support.
+
+```bash
+
+# From workspace root
+west init -l app/
+west update
+west zephyr-export
+
+# Build for ESP32 DevKitC WROOM
+west build -b esp32_devkitc_wroom/esp32/procpu app
+
+# Flash to board
+west flash
+
+# Monitor Console
+west espressif monitor
+
+```
+
+## 💡 Using Tasks in VSCode
+
+If opened up the from the workspace file the common Tasks are already setup you can use **VSCode Tasks** defined in `zephyr_home.code-workspace`.
+
+### Common Tasks
+
+- 🛠 `Build and Flash`: Shortcut: **Ctrl+Shift+B** runs: `west build && west flash`
+- 🖥 `Flash Firmware`: Shortcut: **F5** runs: `west espressif monitor`
+
+### Usage
+
+1. Press **Ctrl+Shift+P** → `Tasks: Run Task`
+2. Choose from:
+   - `Build Only`
+   - `Build Flash`
+   - `Build Flash Monitor`
+   - `Flash Monitor`
+   - `Monitor Only`
+
+---
+
+## 📝 License
+
+This project is licensed under the **GNU AGPLv3**
+© 2025 **Osama Salah-ud-Din**
+
+---
+
+### Testing
+
+To execute Twister integration tests, run the following command:
+
+```shell
+west twister -T tests --integration
+```
+
+### Documentation
+
+A minimal documentation setup is provided for Doxygen and Sphinx. To build the
+documentation first change to the ``doc`` folder:
+
+```shell
+cd doc
+```
+
+Before continuing, check if you have Doxygen installed. It is recommended to
+use the same Doxygen version used in [CI](.github/workflows/docs.yml). To
+install Sphinx, make sure you have a Python installation in place and run:
+
+```shell
+pip install -r requirements.txt
+```
+
+API documentation (Doxygen) can be built using the following command:
+
+```shell
+doxygen
+```
+
+The output will be stored in the ``_build_doxygen`` folder. Similarly, the
+Sphinx documentation (HTML) can be built using the following command:
+
+```shell
+make html
+```
+
+The output will be stored in the ``_build_sphinx`` folder. You may check for
+other output formats other than HTML by running ``make help``.
+
