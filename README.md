@@ -16,88 +16,264 @@
   <img alt="API Documentation" src="https://img.shields.io/badge/API-documentation-3D578C?logo=c&logoColor=white">
 </a>
 
-This repository contains a Zephyr example application. The main purpose of this
-repository is to serve as a reference on how to structure Zephyr-based
-applications. Some of the features demonstrated in this example are:
+# 🌐 Zephyr Home – ESP32 Smart Sensor Platform
 
-- Basic [Zephyr application][app_dev] skeleton
-- [Zephyr workspace applications][workspace_app]
-- [Zephyr modules][modules]
-- [West T2 topology][west_t2]
-- [Custom boards][board_porting]
-- Custom [devicetree bindings][bindings]
-- Out-of-tree [drivers][drivers]
-- Out-of-tree libraries
-- Example CI configuration (using GitHub Actions)
-- Custom [west extension][west_ext]
-- Custom [Zephyr runner][runner_ext]
-- Doxygen and Sphinx documentation boilerplate
+**Zephyr Home** is a modular, event-driven IoT system built on top of **Zephyr RTOS** for the **ESP32 DevKitC WROOM** board. It combines Wi-Fi management, time synchronization, sensor polling, and data transmission through sockets using clean object-oriented design and state machines.
 
-This repository is versioned together with the [Zephyr main tree][zephyr]. This
-means that every time that Zephyr is tagged, this repository is tagged as well
-with the same version number, and the [manifest](west.yml) entry for `zephyr`
-will point to the corresponding Zephyr tag. For example, the `example-application`
-v2.6.0 will point to Zephyr v2.6.0. Note that the `main` branch always
-points to the development branch of Zephyr, also `main`.
+---
 
-[app_dev]: https://docs.zephyrproject.org/latest/develop/application/index.html
-[workspace_app]: https://docs.zephyrproject.org/latest/develop/application/index.html#zephyr-workspace-app
-[modules]: https://docs.zephyrproject.org/latest/develop/modules.html
-[west_t2]: https://docs.zephyrproject.org/latest/develop/west/workspaces.html#west-t2
-[board_porting]: https://docs.zephyrproject.org/latest/guides/porting/board_porting.html
-[bindings]: https://docs.zephyrproject.org/latest/guides/dts/bindings.html
-[drivers]: https://docs.zephyrproject.org/latest/reference/drivers/index.html
-[zephyr]: https://github.com/zephyrproject-rtos/zephyr
-[west_ext]: https://docs.zephyrproject.org/latest/develop/west/extensions.html
-[runner_ext]: https://docs.zephyrproject.org/latest/develop/modules.html#external-runners
+## 🧠 What This App Does
 
-## Getting Started
+- ✅ Connects to Wi-Fi using a State Machine
+- 🕓 Syncs time from an NTP server via SNTP
+- 🌡️ Reads data from I²C-based sensors (light, temperature)
+- 📤 Sends sensor data over UDP/TCP/TLS using a pluggable socket strategy
+- 🔁 Reconnects and retries intelligently on failure
+- 📊 Logs diagnostics over console and optionally via UDP
 
-Before getting started, make sure you have a proper Zephyr development
-environment. Follow the official
-[Zephyr Getting Started Guide](https://docs.zephyrproject.org/latest/getting_started/index.html).
+---
 
-### Initialization
+## 📦 Key Components (Inside `app/src`)
 
-The first step is to initialize the workspace folder (``my-workspace``) where
-the ``example-application`` and all Zephyr modules will be cloned. Run the following
-command:
+| Folder                                                    | Description                                                       |
+|-----------------------------------------------------------|-------------------------------------------------------------------|
+| [`wifiManager`](src/wifiManager/README.md)                | Controls Wi-Fi connection lifecycle                               |
+| [`wifiSM`](src/wifiSM/README.md)                          | Implements a full Wi-Fi **state machine** (Idle → Connected → …)  |
+| [`networkManager`](src/networkManager/README.md)          | Central hub for connectivity, ping, time sync, and socket handling|
+| [`socketManager`](src/socketManager/README.md)            | Opens, sends, and closes sockets by protocol + host + port        |
+| [`sockets`](src/sockets/README.md)                        | Simple wrapper class for socket usage in modules                  |
+| [`sensorManager`](src/sensorManager/README.md)            | Manages all attached sensors and handles polling + sending        |
+| [`lightSensor`](src/lightSensor/README.md)                | Reads light levels from **TSL2561** over I²C                      |
+| [`temperatureSensor`](src/temperatureSensor/README.md)    | Stub for any temperature sensor (e.g., TMP117 or similar)         |
+| [`networkTimeManager`](src/networkTimeManager/README.md)  | SNTP-based network time syncing                                   |
+| [`pingManager`](src/pingManager/README.md)                | Sends ICMP pings and listens for replies                          |
+| `main.cpp`                                                | Bootstraps the system and schedules runtime behavior              |
 
-```shell
-# initialize my-workspace for the example-application (main branch)
-west init -m https://github.com/zephyrproject-rtos/example-application --mr main my-workspace
-# update Zephyr modules
-cd my-workspace
+---
+
+
+## 📘 UML Class Diagram
+
+```mermaid
+classDiagram
+    class main {
+        +main()
+    }
+
+    class wifiManager {
+        +connect()
+        +disconnect()
+    }
+
+    class wifiStateMachine {
+        +setState()
+        +handle()
+    }
+
+    class wifiState
+    class wifiStateIdle
+    class wifiStateConnecting
+    class wifiStateConnected
+    class wifiStateError
+
+    wifiManager --> wifiStateMachine
+    wifiStateMachine --> wifiState
+    wifiState <|-- wifiStateIdle
+    wifiState <|-- wifiStateConnecting
+    wifiState <|-- wifiStateConnected
+    wifiState <|-- wifiStateError
+
+    class pingManager {
+        +send_ping()
+    }
+
+    class networkManager {
+        +init()
+        +monitor()
+        +getInterface()
+    }
+
+    networkManager --> pingManager
+    networkManager --> wifiManager
+
+    class socketManager {
+        +open()
+        +send()
+        +close()
+    }
+
+    class socketStrategy {
+        +connect()
+        +send()
+        +close()
+    }
+
+    class udpSocketStrategy
+    class tcpSocketStrategy
+    class tlsSocketStrategy
+
+    socketStrategy <|-- udpSocketStrategy
+    socketStrategy <|-- tcpSocketStrategy
+    socketStrategy <|-- tlsSocketStrategy
+    socketManager --> socketStrategy
+
+    class sockets {
+        -socketManager* pSocketManager
+        -std::string host
+        -uint16_t port
+        -protocol proto
+        +open()
+        +send()
+        +close()
+    }
+    sockets --> socketManager
+
+    class sensorManager {
+        +init()
+        +readSensors()
+        +sendData()
+    }
+
+    class sensor {
+        +read()
+        +getName()
+    }
+
+    class lightSensor {
+        +read()
+        +getLux()
+    }
+
+    class temperatureSensor {
+        +read()
+        +getCelsius()
+    }
+
+    sensorManager --> sensor
+    sensor <|-- lightSensor
+    sensor <|-- temperatureSensor
+
+    class networkTimeManager {
+        +syncTime()
+    }
+
+    main --> socketManager
+    main --> sensorManager
+    main --> networkManager
+    main --> networkTimeManager
+    main --> sockets
+
+    %% Color using style for classDiagram
+    style wifiManager fill:#D0E8FF,stroke:#003366,color:#000000
+    style wifiStateMachine fill:#D0E8FF,stroke:#003366,color:#000000
+    style wifiState fill:#D0E8FF,stroke:#003366,color:#000000
+    style wifiStateIdle fill:#D0E8FF,stroke:#003366,color:#000000
+    style wifiStateConnecting fill:#D0E8FF,stroke:#003366,color:#000000
+    style wifiStateConnected fill:#D0E8FF,stroke:#003366,color:#000000
+    style wifiStateError fill:#D0E8FF,stroke:#003366,color:#000000
+
+    style socketManager fill:#FFF4D6,stroke:#A67C00,color:#000000
+    style socketStrategy fill:#FFF4D6,stroke:#A67C00,color:#000000
+    style udpSocketStrategy fill:#FFF4D6,stroke:#A67C00,color:#000000
+    style tcpSocketStrategy fill:#FFF4D6,stroke:#A67C00,color:#000000
+    style tlsSocketStrategy fill:#FFF4D6,stroke:#A67C00,color:#000000
+    style sockets fill:#FFF4D6,stroke:#A67C00,color:#000000
+
+    style sensorManager fill:#E1F8DC,stroke:#228B22,color:#000000
+    style sensor fill:#E1F8DC,stroke:#228B22,color:#000000
+    style lightSensor fill:#E1F8DC,stroke:#228B22,color:#000000
+    style temperatureSensor fill:#E1F8DC,stroke:#228B22,color:#000000
+
+    style networkTimeManager fill:#F5D0E8,stroke:#C71585,color:#000000
+    style sntpClient fill:#F5D0E8,stroke:#C71585,color:#000000
+
+    style main fill:#E6E6E6,stroke:#000000,color:#000000
+    style networkManager fill:#E6E6E6,stroke:#000000,color:#000000
+    style pingManager fill:#E6E6E6,stroke:#000000,color:#000000
+
+```
+### ✅ Color Legend
+
+| Color        | Category       |
+|--------------|----------------|
+| 🟦 Blue       | WiFi subsystem |
+| 🟨 Yellow     | Socket system  |
+| 🟩 Green      | Sensor system  |
+| 🩷 Pink       | Time sync      |
+| ⚪ Gray       | Core entry & infra |
+
+
+
+## 🛠 Board Support
+
+- 🧩 Board: `esp32_devkitc_wroom/esp32`
+- 🔌 Peripherals:
+  - I²C on GPIO21 (SDA) and GPIO22 (SCL)
+  - Wi-Fi via onboard ESP32 radio
+
+---
+
+## 🧪 Example Behavior
+
+1. On boot, the system enters `Idle`
+2. Wi-Fi state machine transitions: `Idle → Connecting → Connected`
+3. Once online:
+    - Time is synced via SNTP
+    - Sensors are polled periodically
+    - Data is sent over the selected socket protocol
+4. If disconnected, it auto-retries or gracefully resets
+
+---
+
+## 🛠 Build + Flash Instructions (Zephyr SDK)
+
+Make sure you've set up Zephyr correctly with ESP32 support.
+
+```bash
+
+# From workspace root
+west init -l app/
 west update
-```
+west zephyr-export
 
-### Building and running
+# Build for ESP32 DevKitC WROOM
+west build -b esp32_devkitc_wroom/esp32/procpu app
 
-To build the application, run the following command:
-
-```shell
-cd example-application
-west build -b $BOARD app
-```
-
-where `$BOARD` is the target board.
-
-You can use the `custom_plank` board found in this
-repository. Note that Zephyr sample boards may be used if an
-appropriate overlay is provided (see `app/boards`).
-
-A sample debug configuration is also provided. To apply it, run the following
-command:
-
-```shell
-west build -b $BOARD app -- -DEXTRA_CONF_FILE=debug.conf
-```
-
-Once you have built the application, run the following command to flash it:
-
-```shell
+# Flash to board
 west flash
+
+# Monitor Console
+west espressif monitor
+
 ```
+
+## 💡 Using Tasks in VSCode
+
+If opened up the from the workspace file the common Tasks are already setup you can use **VSCode Tasks** defined in `zephyr_home.code-workspace`.
+
+### Common Tasks
+
+- 🛠 `Build and Flash`: Shortcut: **Ctrl+Shift+B** runs: `west build && west flash`
+- 🖥 `Flash Firmware`: Shortcut: **F5** runs: `west espressif monitor`
+
+### Usage
+
+1. Press **Ctrl+Shift+P** → `Tasks: Run Task`
+2. Choose from:
+   - `Build Only`
+   - `Build Flash`
+   - `Build Flash Monitor`
+   - `Flash Monitor`
+   - `Monitor Only`
+
+---
+
+## 📝 License
+
+This project is licensed under the **GNU AGPLv3**
+© 2025 **Osama Salah-ud-Din**
+
+---
 
 ### Testing
 
@@ -139,3 +315,4 @@ make html
 
 The output will be stored in the ``_build_sphinx`` folder. You may check for
 other output formats other than HTML by running ``make help``.
+
