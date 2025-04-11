@@ -35,19 +35,19 @@
 
 ## 📦 Key Components (Inside `app/src`)
 
-| Folder                                                    | Description                                                       |
-|-----------------------------------------------------------|-------------------------------------------------------------------|
-| [`wifiManager`](src/wifiManager/README.md)                | Controls Wi-Fi connection lifecycle                               |
-| [`wifiSM`](src/wifiSM/README.md)                          | Implements a full Wi-Fi **state machine** (Idle → Connected → …)  |
-| [`networkManager`](src/networkManager/README.md)          | Central hub for connectivity, ping, time sync, and socket handling|
-| [`socketManager`](src/socketManager/README.md)            | Opens, sends, and closes sockets by protocol + host + port        |
-| [`sockets`](src/sockets/README.md)                        | Simple wrapper class for socket usage in modules                  |
-| [`sensorManager`](src/sensorManager/README.md)            | Manages all attached sensors and handles polling + sending        |
-| [`lightSensor`](src/lightSensor/README.md)                | Reads light levels from **TSL2561** over I²C                      |
-| [`temperatureSensor`](src/temperatureSensor/README.md)    | Stub for any temperature sensor (e.g., TMP117 or similar)         |
-| [`networkTimeManager`](src/networkTimeManager/README.md)  | SNTP-based network time syncing                                   |
-| [`pingManager`](src/pingManager/README.md)                | Sends ICMP pings and listens for replies                          |
-| `main.cpp`                                                | Bootstraps the system and schedules runtime behavior              |
+| Folder                                                        | Description                                                       |
+|---------------------------------------------------------------|-------------------------------------------------------------------|
+| [`wifiManager`](app/src/wifiManager/README.md)                | Controls Wi-Fi connection lifecycle                               |
+| [`wifiSM`](app/src/wifiSM/README.md)                          | Implements a full Wi-Fi **state machine** (Idle → Connected → …)  |
+| [`networkManager`](app/src/networkManager/README.md)          | Central hub for connectivity, ping, time sync, and socket handling|
+| [`socketManager`](app/src/socketManager/README.md)            | Opens, sends, and closes sockets by protocol + host + port        |
+| [`sockets`](app/src/sockets/README.md)                        | Simple wrapper class for socket usage in modules                  |
+| [`sensorManager`](app/src/sensorManager/README.md)            | Manages all attached sensors and handles polling + sending        |
+| [`lightSensor`](app/src/lightSensor/README.md)                | Reads light levels from **TSL2561** over I²C                      |
+| [`temperatureSensor`](app/src/temperatureSensor/README.md)    | Stub for any temperature sensor (e.g., TMP117 or similar)         |
+| [`networkTimeManager`](app/src/networkTimeManager/README.md)  | SNTP-based network time syncing                                   |
+| [`pingManager`](app/src/pingManager/README.md)                | Sends ICMP pings and listens for replies                          |
+| `main.cpp`                                                    | Bootstraps the system and schedules runtime behavior              |
 
 ---
 
