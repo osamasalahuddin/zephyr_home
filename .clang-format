@@ -1,0 +1,54 @@
+# .clang-format for Zephyr-style app with your conventions
+
+BasedOnStyle: LLVM
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+AllowShortIfStatementsOnASingleLine: false
+AllowShortBlocksOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Inline
+
+BreakBeforeBraces: Allman
+BraceWrapping:
+  AfterClass: true
+  AfterControlStatement: true
+  AfterEnum: true
+  AfterFunction: true
+  AfterNamespace: true
+  AfterStruct: true
+  BeforeCatch: true
+  BeforeElse: true
+
+ColumnLimit: 120
+
+SpaceBeforeParens: ControlStatements
+SpacesInParentheses: false
+SpaceAfterCStyleCast: true
+
+AlignConsecutiveAssignments: true
+AlignConsecutiveDeclarations: true
+AlignTrailingComments: true
+
+SortIncludes: false
+IncludeBlocks: Preserve
+
+DerivePointerAlignment: false
+PointerAlignment: Left
+
+AllowAllParametersOfDeclarationOnNextLine: true
+AlwaysBreakAfterReturnType: None
+AlwaysBreakBeforeMultilineStrings: false
+
+IndentCaseLabels: true
+IndentGotoLabels: true
+
+Cpp11BracedListStyle: true
+
+# Naming hints (manual, not enforced by clang-format, just documenting)
+# - Variables:           snake_case
+# - Constants/macros:    UPPER_SNAKE_CASE
+# - Functions:           camelCase
+# - Classes:             PascalCase
+# - Enums:               PascalCase or enumName_ValueName
+
