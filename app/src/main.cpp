@@ -64,8 +64,8 @@ int main(void)
     /* Main Function */
     MYLOG("Hello World!");
 
-    lightSensor   lightSensor;
-    sensorManager sensorMgr;
+    lightSensor    lightSensor;
+    sensorManager& sensorMgr = sensorManager::getInstance();
 
     sockets socketTempSensor;
     sockets socketLightSensor;
@@ -107,7 +107,7 @@ int main(void)
         {
             if (k_uptime_get() - start > 10000)
             {
-                sensorMgr.poll_all();
+                sensorMgr.tick();
                 start = k_uptime_get();
                 if (network.isConnectedLAN())
                 {
