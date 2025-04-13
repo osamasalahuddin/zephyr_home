@@ -25,7 +25,6 @@
 #include "portConfig.hpp"
 #include <zephyr/kernel.h>
 #include <zephyr/sys/atomic.h>
-#include <zephyr/net/net_config.h>
 
 /**
  * @class networkManager
@@ -44,7 +43,7 @@ class networkManager : public iManager
      * @brief Initialize the network.
      * @return true if initialization was successful, false otherwise.
      */
-    bool init() override;
+    bool init();
 
     /**
      * @brief Tick the network.
@@ -97,7 +96,6 @@ class networkManager : public iManager
     /* Internal Variables */
     struct k_mutex state_mutex;
     atomic_t       connection_attempts;
-    bool           m_initialized{false};
 
     /**
      * @brief Wait time before starting of the Wifi SM
