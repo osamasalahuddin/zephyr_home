@@ -22,21 +22,23 @@
 
 #include <zephyr/net/socket.h>
 #include <zephyr/net/icmp.h>
-
 #include <zephyr/net/net_if.h>
 #include <zephyr/net/net_ip.h>
+#include <zephyr/kernel.h>
 
 #include <vector>
 #include <string>
 #include <functional>
+#include <atomic>
+
 class pingManager : public iManager
 {
-public:
+  public:
     /***** Local Type Definition *******/
     struct PingRequest
     {
-        int64_t     start_time;
-        std::string ip;
+        int64_t                   start_time;
+        std::string               ip;
         std::function<void(bool)> callback;
     };
 
@@ -47,17 +49,27 @@ public:
     pingManager();
 
     /**
+     * @brief Destructor for the pingManager class.
+     */
+    ~pingManager();
+
+    /**
      * @brief Get the singleton instance of the pingManager class.
      * @return Reference to the singleton instance.
      */
     static pingManager& getInstance();
 
+    /* Delete copy constructor and assignment operator */
+    pingManager(const pingManager&)            = delete;
+    pingManager& operator=(const pingManager&) = delete;
+
     /***** Overriden Virtual Functions from base class *******/
 
     /**
      * @brief Initialization Function of the pingManager class.
+     * @return true if initialization was successful, false otherwise.
      */
-    void init() override;
+    bool init() override;
 
     /**
      * @brief Periodic Tick function of the pingManager class.
@@ -78,18 +90,22 @@ public:
      * @param const char* ip - string ip address.
      * @param struct net_if *iface - network interface to use.
      * @param std::function<void(bool)> callback - callback function to handle the result.
-     *
+     * @return true if ping request was sent successfully, false otherwise.
      */
-    void send_ping(const char* ip, struct net_if *iface = nullptr, std::function<void(bool)> callback = nullptr);
+    bool send_ping(const char* ip, struct net_if* iface = nullptr, std::function<void(bool)> callback = nullptr);
 
     /**
-    * @brief Cleanup the pingManager class.
-    * @note This function should be called to clean up resources used by the pingManager.
-    */
+     * @brief Cleanup the pingManager class.
+     * @note This function should be called to clean up resources used by the pingManager.
+     */
     void cleanup();
 
-private:
+  private:
     /**** Private Members ******/
+    static struct k_mutex instance_mutex;
+    static pingManager*   instance_ptr;
+    struct k_mutex        request_mutex;
+    std::atomic<bool>     is_initialized{false};
 
     /**
      * Define a timeout threshold (e.g., 5000ms or 5 seconds) for ping requests.
@@ -97,25 +113,38 @@ private:
     const uint16_t PING_TIMEOUT_MS = 5000;
 
     /**
-     * Define a timeout threshold (e.g., 5000ms or 5 seconds) for ping requests.
+     * Vector to store pending ping requests.
      */
     std::vector<PingRequest> pending_requests;
 
     /**
-     * Define a timeout threshold (e.g., 5000ms or 5 seconds) for ping requests.
+     * ICMP context for ping operations.
      */
     struct net_icmp_ctx icmp_ctx;
 
     /**** Private Functions ******/
     /**
-    * @brief Process the ping reply.
-    * @param ctx ICMP context used in this request.
-    * @param pkt Received ICMP response network packet.
-    * @param ip_hdr IP header of the packet.
-    * @param icmp_hdr ICMP header of the packet.
-    */
-   static int handle_reply(struct net_icmp_ctx* ctx, struct net_pkt* pkt,
-                            struct net_icmp_ip_hdr* ip_hdr,
-                            struct net_icmp_hdr* icmp_hdr,
-                            void* user_data);
+     * @brief Process the ping reply.
+     * @param ctx ICMP context used in this request.
+     * @param pkt Received ICMP response network packet.
+     * @param ip_hdr IP header of the packet.
+     * @param icmp_hdr ICMP header of the packet.
+     * @return 0 on success, negative error code otherwise.
+     */
+    static int handle_reply(struct net_icmp_ctx* ctx, struct net_pkt* pkt, struct net_icmp_ip_hdr* ip_hdr,
+                            struct net_icmp_hdr* icmp_hdr, void* user_data);
+
+    /**
+     * @brief Validate the network interface.
+     * @param iface Network interface to validate.
+     * @return true if interface is valid, false otherwise.
+     */
+    bool validate_interface(struct net_if* iface);
+
+    /**
+     * @brief Validate the IP address.
+     * @param ip IP address to validate.
+     * @return true if IP is valid, false otherwise.
+     */
+    bool validate_ip(const char* ip);
 };

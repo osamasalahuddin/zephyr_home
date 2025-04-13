@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 #include "temperatureSensor.hpp"
 #include "lightSensor.hpp"
@@ -26,18 +26,126 @@
 #include "sensorManager.hpp"
 #include "socketManager.hpp"
 #include "sockets.hpp"
+#include "myLogger.hpp"
 
-void sensorManager::add_sensor(sensor* sensor, sockets* socket)
+#include <zephyr/kernel.h>
+
+/* Initialize static members */
+struct k_mutex sensorManager::instance_mutex;
+sensorManager* sensorManager::instance_ptr = nullptr;
+
+sensorManager::sensorManager()
 {
-    sensors.push_back({sensor, socket});
+    k_mutex_init(&sensor_mutex);
+    is_initialized = false;
 }
 
-void sensorManager::poll_all()
+sensorManager::~sensorManager()
 {
+    cleanup();
+}
+
+sensorManager& sensorManager::getInstance()
+{
+    if (instance_ptr == nullptr)
+    {
+        k_mutex_lock(&instance_mutex, K_FOREVER);
+        if (instance_ptr == nullptr)
+        {
+            instance_ptr = new sensorManager();
+        }
+        k_mutex_unlock(&instance_mutex);
+    }
+    return *instance_ptr;
+}
+
+bool sensorManager::init()
+{
+    if (is_initialized)
+    {
+        return true;
+    }
+
+    k_mutex_lock(&sensor_mutex, K_FOREVER);
+    is_initialized = true;
+    MYLOG("✅ SensorManager initialized");
+    k_mutex_unlock(&sensor_mutex);
+    return true;
+}
+
+void sensorManager::tick()
+{
+    if (!is_initialized)
+    {
+        return;
+    }
+
+    k_mutex_lock(&sensor_mutex, K_FOREVER);
+
     for (_sensor it : sensors)
     {
-        float value = it._sensor->get_value();
-        std::string payload = std::string(it._sensor->get_id()) + ":" + std::to_string(value);
-        it._socket->send(payload.c_str(), payload.length());
+        if (it._sensor && it._socket)
+        {
+            float       value   = it._sensor->get_value();
+            std::string payload = std::string(it._sensor->get_id()) + ":" + std::to_string(value);
+            it._socket->send(payload.c_str(), payload.length());
+        }
     }
+
+    k_mutex_unlock(&sensor_mutex);
+}
+
+const char* sensorManager::name() const
+{
+    return "sensorManager";
+}
+
+bool sensorManager::add_sensor(sensor* sensor, sockets* socket)
+{
+    if (!is_initialized)
+    {
+        MYLOG("❌ Sensor manager not initialized");
+        return false;
+    }
+
+    if (!sensor || !socket)
+    {
+        MYLOG("❌ Invalid sensor or socket pointer");
+        return false;
+    }
+
+    k_mutex_lock(&sensor_mutex, K_FOREVER);
+
+    /* Check if sensor already exists */
+    for (const auto& s : sensors)
+    {
+        if (s._sensor == sensor)
+        {
+            MYLOG("❌ Sensor already exists");
+            k_mutex_unlock(&sensor_mutex);
+            return false;
+        }
+    }
+
+    sensors.push_back({sensor, socket});
+    MYLOG("✅ Added sensor: %s", sensor->get_id());
+
+    k_mutex_unlock(&sensor_mutex);
+    return true;
+}
+
+void sensorManager::cleanup()
+{
+    if (!is_initialized)
+    {
+        return;
+    }
+
+    k_mutex_lock(&sensor_mutex, K_FOREVER);
+
+    sensors.clear();
+    is_initialized = false;
+
+    MYLOG("Sensor manager cleaned up");
+    k_mutex_unlock(&sensor_mutex);
 }
