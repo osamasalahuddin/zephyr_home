@@ -162,7 +162,8 @@ bool pingManager::send_ping(const char* ip, struct net_if* iface, std::function<
         return false;
     }
 
-    MYLOG("🏓 Ping sent to %s", ip);
+    /*  MYLOG("🏓 Ping sent to %s", ip); */
+
     k_mutex_unlock(&request_mutex);
     return true;
 }
@@ -256,5 +257,5 @@ bool pingManager::validate_ip(const char* ip)
     }
 
     struct sockaddr addr;
-    return net_ipaddr_parse(ip, strlen(ip), &addr) >= 0;
+    return net_ipaddr_parse(ip, strlen(ip), &addr);
 }
