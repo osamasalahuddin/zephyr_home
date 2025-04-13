@@ -155,8 +155,6 @@ bool networkTimeManager::perform_sync(const char* server, int timeout_ms)
     struct tm time_info;
     time_t    time = sntpTime.seconds;
     gmtime_r(&time, &time_info);
-    MYLOG("Time synced: %04d-%02d-%02d %02d:%02d:%02d", time_info.tm_year + 1900, time_info.tm_mon + 1,
-          time_info.tm_mday, time_info.tm_hour, time_info.tm_min, time_info.tm_sec);
 
     if ((time_info.tm_mon + 1 > 3) && (time_info.tm_mon + 1 < 11))
     {
@@ -171,6 +169,9 @@ bool networkTimeManager::perform_sync(const char* server, int timeout_ms)
                                   time_info.tm_sec) *
                                      MSEC_PER_SEC);
     }
+
+    MYLOG("Time synced: %04d-%02d-%02d %02d:%02d:%02d", time_info.tm_year + 1900, time_info.tm_mon + 1,
+          time_info.tm_mday, time_info.tm_hour, time_info.tm_min, time_info.tm_sec);
 
     k_mutex_unlock(&state_mutex);
 
