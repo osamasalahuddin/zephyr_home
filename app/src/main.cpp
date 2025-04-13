@@ -56,7 +56,7 @@ static void ntp_sync_thread(void*, void*, void*)
             ntp.sync(nullptr, 5000);
             MYLOG("⏰ System Time Synced");
         }
-        k_sleep(K_SECONDS(10));
+        k_sleep(K_MINUTES(1));
     }
 }
 
