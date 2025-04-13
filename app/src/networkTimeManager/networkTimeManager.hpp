@@ -20,6 +20,11 @@
 #pragma once
 
 #include <string>
+#include <vector>
+#include <algorithm>
+
+#include <zephyr/net/sntp.h>
+// #include "../systemTime/timeObserver.hpp"
 
 class networkTimeManager
 {
@@ -29,11 +34,42 @@ public:
     void init();
     bool sync(const char* server, int timeout_ms = 5000);
     bool is_synced() const;
+    int64_t get_network_time();
+    // void addObserver(timeObserver* observer) {
+        //     observers.push_back(observer);
+        // }
 
-private:
+        // void removeObserver(timeObserver* observer) {
+            //     // observers.erase(observer);
+            //     /* observers.erase(
+                //         std::remove(observers.begin(), observers.end(), observer),
+                //         observers.end()
+                //     );*/
+                // }
+
+                // void notifyObservers(const struct timespec& newTime) {
+                    //     for (auto observer : observers) {
+    //         observer->onTimeUpdate(newTime);
+    //     }
+    // }
+
+    private:
     networkTimeManager() = default;
+    void convert_unix_time_to_date(uint64_t unix_time);
 
     bool synced = false;
 
     const uint8_t SNTP_PORT = 123;
+
+    /**
+     * @brief Value of last system uptime before network sync
+     */
+    int64_t last_uptime;
+
+    struct sntp_time sntp_time;
+
+    int64_t synced_time;
+
+    // std::vector<timeObserver*> observers;
+    static networkTimeManager* instance;
 };
