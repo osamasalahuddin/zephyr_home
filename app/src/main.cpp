@@ -33,27 +33,26 @@ LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
 #include "sensorManager.hpp"
 #include "lightSensor.hpp"
 
-#define STACK_SIZE      (4096)
-#define TASK_PRIORITY   (-1)
+#define STACK_SIZE (4096)
+#define TASK_PRIORITY (-1)
 
-K_THREAD_STACK_DEFINE(ntp_stack,  STACK_SIZE);
+K_THREAD_STACK_DEFINE(ntp_stack, STACK_SIZE);
 
 static struct k_thread ntp_thread;
 
 K_MUTEX_DEFINE(mutex);
 K_CONDVAR_DEFINE(condvar);
 
-
 static void ntp_sync_thread(void*, void*, void*)
 {
-    networkManager& network = networkManager::getInstance();
-    networkTimeManager& ntp = networkTimeManager::getInstance();
+    networkManager&     network = networkManager::getInstance();
+    networkTimeManager& ntp     = networkTimeManager::getInstance();
 
     while (true)
     {
         if (network.isConnectedWAN())
         {
-            ntp.sync(nullptr, 5000);
+            ntp.tick();
             MYLOG("⏰ System Time Synced");
         }
         k_sleep(K_MINUTES(1));
@@ -65,19 +64,18 @@ int main(void)
     /* Main Function */
     MYLOG("Hello World!");
 
-    lightSensor lightSensor;
+    lightSensor   lightSensor;
     sensorManager sensorMgr;
 
     sockets socketTempSensor;
     sockets socketLightSensor;
 
     networkManager& network = networkManager::getInstance();
-    myLogger& logger = myLogger::getInstance();
+    myLogger&       logger  = myLogger::getInstance();
 
     sensorMgr.add_sensor(&lightSensor, &socketLightSensor);
 
-    socketLightSensor.open(networkManager::getInstance().getLocalServer(),
-                           portConfig::DEVICE_CONTROL,
+    socketLightSensor.open(networkManager::getInstance().getLocalServer(), portConfig::DEVICE_CONTROL,
                            socketManager::protocol::UDP);
 
     /* Initialize Network Manager */
@@ -86,9 +84,8 @@ int main(void)
 
     bool isSocket = false;
 
-    bool ret = socketTempSensor.open(network.getLocalServer(),
-                           portConfig::PORT_TEMP_SENSOR,
-                           socketManager::protocol::UDP);
+    bool ret =
+        socketTempSensor.open(network.getLocalServer(), portConfig::PORT_TEMP_SENSOR, socketManager::protocol::UDP);
     if (!ret)
     {
         MYLOG("Socket Initialization Failed: %d", ret);
@@ -99,8 +96,7 @@ int main(void)
     uint64_t start = k_uptime_get();
 
     /* Create a Thread for SNTP Issue */
-    k_thread_create(&ntp_thread, ntp_stack, K_THREAD_STACK_SIZEOF(ntp_stack),
-                    ntp_sync_thread, NULL, NULL, NULL,
+    k_thread_create(&ntp_thread, ntp_stack, K_THREAD_STACK_SIZEOF(ntp_stack), ntp_sync_thread, NULL, NULL, NULL,
                     TASK_PRIORITY, 0, K_NO_WAIT);
 
     while (true)
@@ -118,8 +114,7 @@ int main(void)
                     MYLOG(" 💻 Connected to LAN");
                     if (isSocket)
                     {
-                        MYLOG("Sent Data to local server. Return: %d",
-                                socketTempSensor.send("LAN", 4));
+                        MYLOG("Sent Data to local server. Return: %d", socketTempSensor.send("LAN", 4));
                     }
                 }
                 else
