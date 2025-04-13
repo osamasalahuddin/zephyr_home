@@ -1,4 +1,3 @@
-
 /*
  * This file is part of the Zephyr Home project.
  *
@@ -24,14 +23,17 @@
 #include "wifiManager.hpp"
 #include "pingManager.hpp"
 #include "portConfig.hpp"
+#include <zephyr/kernel.h>
+#include <zephyr/sys/atomic.h>
+#include <zephyr/net/net_config.h>
 
 /**
  * @class networkManager
  * @brief Singleton class to manage network-related functionality.
  */
-class networkManager  : public iManager
+class networkManager : public iManager
 {
-public:
+  public:
     /**
      * @brief Get the singleton instance of the networkManager class.
      * @return Reference to the singleton instance.
@@ -40,8 +42,9 @@ public:
 
     /**
      * @brief Initialize the network.
+     * @return true if initialization was successful, false otherwise.
      */
-    void init();
+    bool init() override;
 
     /**
      * @brief Tick the network.
@@ -77,9 +80,24 @@ public:
      * @return True if network is up, false otherwise.
      */
     bool isNetworkUp();
-private:
 
-    /** Internal Variables */
+    /**
+     * @brief Get the current network state.
+     * @return Current network state.
+     */
+    wifiStateEnum getNetworkState() const;
+
+    /**
+     * @brief Get the number of connection attempts.
+     * @return Number of connection attempts.
+     */
+    uint32_t getConnectionAttempts() const;
+
+  private:
+    /* Internal Variables */
+    struct k_mutex state_mutex;
+    atomic_t       connection_attempts;
+    bool           m_initialized{false};
 
     /**
      * @brief Wait time before starting of the Wifi SM
@@ -106,48 +124,48 @@ private:
     /**
      * @brief For Time Stamping the network connection
      */
-    int64_t start;
+    atomic_t start_time;
 
     /**
-     * @brief String Values gotten from build system for WAN Server
+     * @brief For tracking ticks
      */
-    uint8_t ticks;
+    atomic_t tick_count;
 
     /**
      * @brief Flag to check if the network is requested to connect.
      * @note This is set to true when the network manager is requested to connect
      */
-    bool isConnectRequested;
+    atomic_t is_connect_requested;
 
     /**
      * @brief Flag to check if the network is in a new connection state.
      * @note This is set to true when the network manager is requested to connect
      */
-    bool isNewConnect;
+    atomic_t is_new_connection;
 
     /**
      * @brief Flag to check if the network is connected to LAN or not.
      * @note This is set to true when the pingManager receives a successful response
      */
-    bool isLanConnected;
+    atomic_t is_lan_connected;
 
     /**
      * @brief Flag to check if the network is connected to WAN or not.
      * @note This is set to true when the pingManager receives a successful response
      */
-    bool isWanConnected;
+    atomic_t is_wan_connected;
 
     /**
      * @brief State of the WiFi connection.
      * @note This is set to the current state of the WiFi connection
      *       using the wifiManager class.
      */
-    wifiStateEnum wifiState;
+    atomic_t wifi_state;
 
-    /** WiFi instance pointer */
+    /* WiFi instance pointer */
     wifiManager& wifi;
 
-    /** PingManager instance pointer */
+    /* PingManager instance pointer */
     pingManager& ping;
 
     /**
@@ -174,4 +192,21 @@ private:
      * @brief Callback that will be called by pingManager for Remote Server Request.
      */
     static void setIsConnectedWAN(bool value);
+
+    /**
+     * @brief Handle network state changes.
+     * @param new_state The new network state.
+     */
+    void handleNetworkStateChange(wifiStateEnum new_state);
+
+    /**
+     * @brief Reset network state.
+     */
+    void resetNetworkState();
+
+    /**
+     * @brief Check if it's time to reconnect.
+     * @return true if it's time to reconnect, false otherwise.
+     */
+    bool shouldReconnect() const;
 };
