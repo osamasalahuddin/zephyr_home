@@ -23,6 +23,8 @@
 #include <string.h>
 #include <iostream>
 
+#include "networkTimeManager.hpp"
+
 /*
     Logging macro with formatted uptime
     and trimmed file path (removes top 2 folders)
@@ -55,9 +57,15 @@ public:
             if (__slashes == 2) __short_file = p + 1;                   \
         }                                                               \
     }                                                                   \
-                                                                        \
+    int64_t __uptime_ms;                                                \
     /* Get uptime in milliseconds */                                    \
-    int64_t __uptime_ms = k_uptime_get();                               \
+    if(networkTimeManager::getInstance().is_synced()) {                 \
+        __uptime_ms = networkTimeManager::getInstance().get_network_time();\
+    }                                                                   \
+    else{                                                               \
+        __uptime_ms = k_uptime_get();                                   \
+    }                                                                   \
+                                                                        \
                                                                         \
     /* Convert to hh:mm:ss.mmm format */                                \
     int64_t __hours = __uptime_ms / (1000 * 60 * 60);                   \
