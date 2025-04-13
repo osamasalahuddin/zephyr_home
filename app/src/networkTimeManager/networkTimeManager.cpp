@@ -161,15 +161,15 @@ bool networkTimeManager::perform_sync(const char* server, int timeout_ms)
     if ((time_info.tm_mon + 1 > 3) && (time_info.tm_mon + 1 < 11))
     {
         /* Daylight Savings Time */
-        atomic_set(&synced_time,
-                   (((time_info.tm_hour + 2) * SEC_PER_HOUR) + (time_info.tm_min * SEC_PER_MIN) + time_info.tm_sec) *
-                       MSEC_PER_SEC);
+        atomic_set(&synced_time, ((((time_info.tm_hour + 2) % 24) * SEC_PER_HOUR) + (time_info.tm_min * SEC_PER_MIN) +
+                                  time_info.tm_sec) *
+                                     MSEC_PER_SEC);
     }
     else
     {
-        atomic_set(&synced_time,
-                   (((time_info.tm_hour + 1) * SEC_PER_HOUR) + (time_info.tm_min * SEC_PER_MIN) + time_info.tm_sec) *
-                       MSEC_PER_SEC);
+        atomic_set(&synced_time, (((((time_info.tm_hour + 1)) % 24) * SEC_PER_HOUR) + (time_info.tm_min * SEC_PER_MIN) +
+                                  time_info.tm_sec) *
+                                     MSEC_PER_SEC);
     }
 
     k_mutex_unlock(&state_mutex);
@@ -232,6 +232,6 @@ void networkTimeManager::convert_unix_time_to_date(uint64_t unix_time)
     time_t    time = unix_time;
     gmtime_r(&time, &time_info);
 
-    MYLOG("Time: %04d-%02d-%02d %02d:%02d:%02d", time_info.tm_year + 1900, time_info.tm_mon + 1, time_info.tm_mday,
+    MYLOG("UTC Time: %04d-%02d-%02d %02d:%02d:%02d", time_info.tm_year + 1900, time_info.tm_mon + 1, time_info.tm_mday,
           time_info.tm_hour, time_info.tm_min, time_info.tm_sec);
 }
