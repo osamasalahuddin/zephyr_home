@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 #pragma once
 
@@ -24,16 +24,16 @@
 namespace portConfig
 {
 
-    /* Sensor data upload port (TCP) */
-    constexpr int PORT_TEMP_SENSOR   = 50000;
+/* Sensor data upload port (TCP) */
+constexpr int PORT_TEMP_SENSOR = 50000;
 
-    /* Device control port (TCP) */
-    constexpr int DEVICE_CONTROL     = 50001;
+/* Device control port (TCP) */
+constexpr int PORT_LIGHT_SENSOR = 50001;
 
-    /* Time sync proxy service (if applicable) */
-    constexpr int TIME_SYNC_PROXY    = 50002;
+/* Time sync proxy service (if applicable) */
+constexpr int PORT_HUMIDITY_SENSOR = 50002;
 
-    /* Reserved for future use */
-    constexpr int DEBUG_CONSOLE      = 50050;
+/* Reserved for future use */
+constexpr int DEBUG_CONSOLE = 50050;
 
 } // namespace portConfig
