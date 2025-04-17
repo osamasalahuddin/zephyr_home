@@ -73,25 +73,22 @@ int main(void)
     networkManager& network = networkManager::getInstance();
     myLogger&       logger  = myLogger::getInstance();
 
-    sensorMgr.add_sensor(&lightSensor, &socketLightSensor);
-
-    socketLightSensor.open(networkManager::getInstance().getLocalServer(), portConfig::DEVICE_CONTROL,
-                           socketManager::protocol::UDP);
-
     /* Initialize Network Manager */
     network.init();
     logger.init();
+    sensorMgr.init();
 
-    bool isSocket = false;
+    sensorMgr.add_sensor(&lightSensor, &socketLightSensor);
 
-    bool ret =
+    socketLightSensor.open(networkManager::getInstance().getLocalServer(), portConfig::PORT_LIGHT_SENSOR,
+                           socketManager::protocol::UDP);
+
+    bool isSocket =
         socketTempSensor.open(network.getLocalServer(), portConfig::PORT_TEMP_SENSOR, socketManager::protocol::UDP);
-    if (!ret)
+    if (!isSocket)
     {
-        MYLOG("Socket Initialization Failed: %d", ret);
+        MYLOG("Socket Initialization Failed: %d", isSocket);
     }
-
-    isSocket = ret;
 
     uint64_t start = k_uptime_get();
 

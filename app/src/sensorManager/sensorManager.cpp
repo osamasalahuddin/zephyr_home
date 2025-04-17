@@ -49,12 +49,7 @@ sensorManager& sensorManager::getInstance()
 {
     if (instance_ptr == nullptr)
     {
-        k_mutex_lock(&instance_mutex, K_FOREVER);
-        if (instance_ptr == nullptr)
-        {
-            instance_ptr = new sensorManager();
-        }
-        k_mutex_unlock(&instance_mutex);
+        instance_ptr = new sensorManager();
     }
     return *instance_ptr;
 }
@@ -66,10 +61,9 @@ bool sensorManager::init()
         return true;
     }
 
-    k_mutex_lock(&sensor_mutex, K_FOREVER);
     is_initialized = true;
     MYLOG("✅ SensorManager initialized");
-    k_mutex_unlock(&sensor_mutex);
+
     return true;
 }
 

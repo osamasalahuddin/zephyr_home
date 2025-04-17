@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 #pragma once
 
@@ -29,7 +29,7 @@
     Logging macro with formatted uptime
     and trimmed file path (removes top 2 folders)
 */
-#define LOG_MSG_LENGTH      512
+#define LOG_MSG_LENGTH 512
 // #define NET_LOG_MSG_LENGTH 1024
 
 // static char __netlog_msg[NET_LOG_MSG_LENGTH];
@@ -37,48 +37,52 @@ extern char __mylog_msg[LOG_MSG_LENGTH];
 
 class myLogger
 {
-public:
+  public:
     static myLogger& getInstance();
-    void init();
-    void send(const char* log_msg, size_t len);
-    bool isSocket;
+    void             init();
+    void             send(const char* log_msg, size_t len);
+    bool             isSocket;
 };
 
-#define MYLOG(fmt, ...) do {                                            \
-    /* Get full path from __FILE__ */                                   \
-    const char* __full_path = __FILE__;                                 \
-    const char* __short_file = __full_path;                             \
-                                                                        \
-    /* Strip top 2 folders from path */                                 \
-    int __slashes = 0;                                                  \
-    for (const char* p = __full_path; *p; ++p) {                        \
-        if (*p == '/') {                                                \
-            __slashes++;                                                \
-            if (__slashes == 2) __short_file = p + 1;                   \
-        }                                                               \
-    }                                                                   \
-    int64_t __uptime_ms;                                                \
-    /* Get uptime in milliseconds */                                    \
-    if(networkTimeManager::getInstance().is_synced()) {                 \
-        __uptime_ms = networkTimeManager::getInstance().get_network_time();\
-    }                                                                   \
-    else{                                                               \
-        __uptime_ms = k_uptime_get();                                   \
-    }                                                                   \
-                                                                        \
-                                                                        \
-    /* Convert to hh:mm:ss.mmm format */                                \
-    int64_t __hours = __uptime_ms / (1000 * 60 * 60);                   \
-    int64_t __minutes = (__uptime_ms / (1000 * 60)) % 60;               \
-    int64_t __seconds = (__uptime_ms / 1000) % 60;                      \
-    int64_t __milliseconds = __uptime_ms % 1000;                        \
-                                                                        \
-    /* Format and print the log message */                              \
-    int __len = snprintf(__mylog_msg, sizeof(__mylog_msg),              \
-        "[%02lld:%02lld:%02lld.%03lld] %s:%d - " fmt ,                  \
-        __hours, __minutes, __seconds, __milliseconds,                  \
-        __short_file, __LINE__, ##__VA_ARGS__);                         \
-    printk("%s\n", __mylog_msg);                                        \
-    myLogger::getInstance().send(__mylog_msg, __len);                   \
-        \
-} while (0);
+#define MYLOG(fmt, ...)                                                                                                \
+    do                                                                                                                 \
+    {                                                                                                                  \
+        /* Get full path from __FILE__ */                                                                              \
+        const char* __full_path  = __FILE__;                                                                           \
+        const char* __short_file = __full_path;                                                                        \
+                                                                                                                       \
+        /* Strip top 2 folders from path */                                                                            \
+        int __slashes = 0;                                                                                             \
+        for (const char* p = __full_path; *p; ++p)                                                                     \
+        {                                                                                                              \
+            if (*p == '/')                                                                                             \
+            {                                                                                                          \
+                __slashes++;                                                                                           \
+                if (__slashes == 2)                                                                                    \
+                    __short_file = p + 1;                                                                              \
+            }                                                                                                          \
+        }                                                                                                              \
+        static int64_t __uptime_ms;                                                                                    \
+        /* Get uptime in milliseconds */                                                                               \
+        if (networkTimeManager::getInstance().is_synced())                                                             \
+        {                                                                                                              \
+            __uptime_ms = networkTimeManager::getInstance().get_network_time();                                        \
+        }                                                                                                              \
+        else                                                                                                           \
+        {                                                                                                              \
+            __uptime_ms = k_uptime_get();                                                                              \
+        }                                                                                                              \
+                                                                                                                       \
+        /* Convert to hh:mm:ss.mmm format */                                                                           \
+        int64_t __hours        = __uptime_ms / (1000 * 60 * 60);                                                       \
+        int64_t __minutes      = (__uptime_ms / (1000 * 60)) % 60;                                                     \
+        int64_t __seconds      = (__uptime_ms / 1000) % 60;                                                            \
+        int64_t __milliseconds = __uptime_ms % 1000;                                                                   \
+                                                                                                                       \
+        /* Format and print the log message */                                                                         \
+        int __len = snprintf(__mylog_msg, sizeof(__mylog_msg), "[%02lld:%02lld:%02lld.%03lld] %s:%d - " fmt, __hours,  \
+                             __minutes, __seconds, __milliseconds, __short_file, __LINE__, ##__VA_ARGS__);             \
+        printk("%s\n", __mylog_msg);                                                                                   \
+        myLogger::getInstance().send(__mylog_msg, __len);                                                              \
+                                                                                                                       \
+    } while (0);
