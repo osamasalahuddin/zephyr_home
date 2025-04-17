@@ -15,20 +15,25 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 #pragma once
 #include "sensor.hpp"
 
 class temperatureSensor : public sensor
 {
-public:
+  public:
+    /**
+     * @brief Constructor for the temperatureSensor class.
+     */
+    temperatureSensor();
+
     const char* get_id() const override;
 
     float get_value() const override;
 
     void tick() override;
-private:
-    float read_value() override;
 
+  private:
+    float read_value() override;
 };
