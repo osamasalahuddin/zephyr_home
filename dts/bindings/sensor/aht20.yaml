@@ -1,0 +1,22 @@
+description: AHT20 temperature and humidity sensor
+
+compatible: "aosong,aht20"
+
+include: ["i2c-device.yaml"]
+
+properties:
+  label:
+    type: string
+    required: true
+    description: Human-readable string describing the sensor
+
+  irq-gpios:
+    type: phandle-array
+    required: false
+    description: Optional alert/interrupt GPIO if supported and wired
+
+  power-gpios:
+    type: phandle-array
+    required: false
+    description: Optional GPIO for enabling/disabling sensor power
+
