@@ -1,0 +1,24 @@
+# SPDX-License-Identifier: Apache-2.0
+
+menuconfig AHT20
+    bool "Enable AHT20"
+    default y
+    depends on I2C
+    help
+      Enable driver for the AHT20 sensor from Aosong.
+
+if AHT20
+
+config AHT20_TRIGGER
+    bool "Enable trigger support"
+    depends on GPIO
+    help
+      Enable optional interrupt trigger support for AHT20 (if connected via alert pin).
+
+config AHT20_LOG_LEVEL
+    int "Log level"
+    range 0 4
+    default 3
+    help
+      Set log level for AHT20 driver.
+endif # AHT20
