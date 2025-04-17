@@ -54,23 +54,19 @@ namespace
     This keeps registration logic with the class definition itself — no need to edit a
     centralized file or factory list every time you add a new manager.
 */
-bool registered = [] {
+bool registered = []
+{
     managerFactory::registerManager("wifi", [] { return new wifiManager(); });
     return true;
 }();
 
-}
+} // namespace
 
 /* Definition of the static Singleton */
 wifiManager* wifiManager::instance_ptr;
 
-wifiManager::wifiManager():
-            isConnecting(false),
-            isError(false),
-            isIpObtained(false),
-            isScanComplete(false),
-            state(IDLE),
-            iface(nullptr)
+wifiManager::wifiManager()
+    : isConnecting(false), isError(false), isIpObtained(false), isScanComplete(false), state(IDLE), iface(nullptr)
 {
     instance_ptr = nullptr;
 }
@@ -88,9 +84,8 @@ wifiManager& wifiManager::getInstance()
 void wifiManager::register_wifi_events()
 {
     net_mgmt_init_event_callback(&wifi_cb, wifi_mgmt_event_handler,
-                                    NET_EVENT_WIFI_CONNECT_RESULT |
-                                    NET_EVENT_WIFI_DISCONNECT_RESULT |
-                                    NET_EVENT_WIFI_SCAN_RESULT );
+                                 NET_EVENT_WIFI_CONNECT_RESULT | NET_EVENT_WIFI_DISCONNECT_RESULT |
+                                     NET_EVENT_WIFI_SCAN_RESULT);
 
     net_mgmt_init_event_callback(&ipv4_cb, ipv4_mgmt_event_handler, NET_EVENT_IPV4_ADDR_ADD);
 
@@ -130,20 +125,19 @@ void wifiManager::reinit()
     // }
 
     MYLOG("🚀 [wifiManager] Starting Wi-Fi State Machine");
-
 }
 
-void wifiManager::init()
+bool wifiManager::init()
 {
     MYLOG("[wifiManager] Initialization started");
 
     /* Initialization logic here */
 
     /* State Machine Initialization */
-    idle = new wifiStateIdle(nullptr);
+    idle         = new wifiStateIdle(nullptr);
     disconnected = new wifiStateDisconnected(idle);
-    connected = new wifiStateConnected(disconnected);
-    connecting = new wifiStateConnecting(connected);
+    connected    = new wifiStateConnected(disconnected);
+    connecting   = new wifiStateConnecting(connected);
 
     /* Connect the loop back */
     *idle = wifiStateIdle(connecting);
@@ -159,7 +153,7 @@ void wifiManager::init()
     //     }
     // }
 
-    iface  = net_if_get_first_wifi();
+    iface = net_if_get_first_wifi();
 
     /* StateMachine Context */
     context = new wifiContext(idle, iface);
@@ -205,6 +199,7 @@ void wifiManager::init()
         context->setState(static_cast<wifiState*>(error));
     }
 
+    return true;
 }
 
 void wifiManager::tick()
@@ -284,7 +279,7 @@ wifi_iface_status wifiManager::get_wifi_status(struct net_if* iface)
     return status;
 }
 
-struct net_if * wifiManager::get_wifi_iface()
+struct net_if* wifiManager::get_wifi_iface()
 {
     return iface;
 }

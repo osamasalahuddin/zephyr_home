@@ -6,10 +6,17 @@
 # You can browse these options using the west targets menuconfig (terminal) or
 # guiconfig (GUI).
 
+# For Configuring Zephyr
 menu "Zephyr"
 source "Kconfig.zephyr"
 endmenu
 
+# For Configuring Custom Drivers/Libraries
+menu "Custom Drivers/Libraries"
+rsource "../Kconfig"
+endmenu
+
+# For Creating Logging Module for Application
 module = APP
 module-str = APP
 source "subsys/logging/Kconfig.template.log_config"
