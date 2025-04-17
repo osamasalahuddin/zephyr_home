@@ -24,14 +24,14 @@
 namespace portConfig
 {
 
-/* Sensor data upload port (TCP) */
+/* Temperature Sensor port (UDP) */
 constexpr int PORT_TEMP_SENSOR = 50000;
 
-/* Device control port (TCP) */
+/* Light Sensor port (UDP) */
 constexpr int PORT_LIGHT_SENSOR = 50001;
 
-/* Time sync proxy service (if applicable) */
-constexpr int PORT_HUMIDITY_SENSOR = 50002;
+/* Air Quality Sensor port (UDP) */
+constexpr int PORT_AIR_QUALITY_SENSOR = 50002;
 
 /* Reserved for future use */
 constexpr int DEBUG_CONSOLE = 50050;
