@@ -15,7 +15,7 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 #include <zephyr/device.h>
 #include <zephyr/drivers/sensor.h>
@@ -23,12 +23,10 @@
 #include "lightSensor.hpp"
 #include "myLogger.hpp"
 
-lightSensor::lightSensor():
-                lux(0.0f),
-                dev(nullptr)
+lightSensor::lightSensor() : lux(0.0f), dev(nullptr)
 {
     // dev = DEVICE_DT_GET(DT_N_NODELABEL_mylight_sensor);
-    // dev = DEVICE_DT_GET(DT_NODELABEL(LIGHT_SENSOR));
+    // dev = DEVICE_DT_GET(DT_NODELABEL(light_sensor));
 
     dev = device_get_binding("light_sensor");
     if (NULL == dev)
@@ -36,7 +34,7 @@ lightSensor::lightSensor():
         MYLOG(" Light Sensor Device not found");
     }
 
-    if (! ::device_is_ready(dev))
+    if (!::device_is_ready(dev))
     {
         MYLOG(" Light Sensor Device not ready");
     }
@@ -56,7 +54,7 @@ void lightSensor::tick()
     lux = read_value();
     if (lux >= 0.0f)
     {
-        MYLOG("📸 Light: %.2f lux", (double)lux);
+        MYLOG("📸 Light: %.2f lux", (double) lux);
     }
 }
 
@@ -84,7 +82,7 @@ float lightSensor::read_value()
             /* Get the sampled data */
             err_code = ::sensor_channel_get(dev, SENSOR_CHAN_LIGHT, &value);
 
-            if ( err_code < 0)
+            if (err_code < 0)
             {
                 MYLOG("Failed to read light sensor. Error: %d", err_code);
             }
@@ -102,4 +100,3 @@ float lightSensor::read_value()
 
     return return_value;
 }
-

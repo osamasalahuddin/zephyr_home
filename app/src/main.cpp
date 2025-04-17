@@ -31,7 +31,9 @@ LOG_MODULE_REGISTER(main, CONFIG_APP_LOG_LEVEL);
 #include "sockets.hpp"
 
 #include "sensorManager.hpp"
+#include "airQualitySensor.hpp"
 #include "lightSensor.hpp"
+#include "temperatureSensor.hpp"
 
 #define STACK_SIZE (4096)
 #define TASK_PRIORITY (-1)
@@ -64,11 +66,15 @@ int main(void)
     /* Main Function */
     MYLOG("Hello World!");
 
-    lightSensor    lightSensor;
+    lightSensor       lightSensor;
+    airQualitySensor  airQualitySensor;
+    temperatureSensor temperatureSensor;
+
     sensorManager& sensorMgr = sensorManager::getInstance();
 
-    sockets socketTempSensor;
+    sockets socketAirQualitySensor;
     sockets socketLightSensor;
+    sockets socketTempSensor;
 
     networkManager& network = networkManager::getInstance();
     myLogger&       logger  = myLogger::getInstance();
@@ -79,15 +85,37 @@ int main(void)
     sensorMgr.init();
 
     sensorMgr.add_sensor(&lightSensor, &socketLightSensor);
+    sensorMgr.add_sensor(&airQualitySensor, &socketAirQualitySensor);
+    sensorMgr.add_sensor(&temperatureSensor, &socketTempSensor);
+
+    socketLightSensor.open(networkManager::getInstance().getLocalServer(), portConfig::PORT_AIR_QUALITY_SENSOR,
+                           socketManager::protocol::UDP);
 
     socketLightSensor.open(networkManager::getInstance().getLocalServer(), portConfig::PORT_LIGHT_SENSOR,
+                           socketManager::protocol::UDP);
+
+    socketLightSensor.open(networkManager::getInstance().getLocalServer(), portConfig::PORT_TEMP_SENSOR,
                            socketManager::protocol::UDP);
 
     bool isSocket =
         socketTempSensor.open(network.getLocalServer(), portConfig::PORT_TEMP_SENSOR, socketManager::protocol::UDP);
     if (!isSocket)
     {
-        MYLOG("Socket Initialization Failed: %d", isSocket);
+        MYLOG(" Temperature Sensor Socket Initialization Failed: %d", isSocket);
+    }
+
+    isSocket = socketAirQualitySensor.open(network.getLocalServer(), portConfig::PORT_AIR_QUALITY_SENSOR,
+                                           socketManager::protocol::UDP);
+    if (!isSocket)
+    {
+        MYLOG(" Air Quality Sensor Socket Initialization Failed: %d", isSocket);
+    }
+
+    isSocket =
+        socketLightSensor.open(network.getLocalServer(), portConfig::PORT_LIGHT_SENSOR, socketManager::protocol::UDP);
+    if (!isSocket)
+    {
+        MYLOG(" Light Sensor Socket Initialization Failed: %d", isSocket);
     }
 
     uint64_t start = k_uptime_get();
