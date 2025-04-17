@@ -15,11 +15,32 @@
  *
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
-*/
+ */
 
 #include "sensorManager.hpp"
 #include "temperatureSensor.hpp"
 #include "myLogger.hpp"
+
+temperatureSensor::temperatureSensor()
+{
+    // Initialize the sensor
+    const struct device* dev;
+    dev = DEVICE_DT_GET(DT_NODELABEL(temperature_sensor));
+
+    if (NULL == dev)
+    {
+        MYLOG(" Temperature Sensor Device not found");
+    }
+
+    if (!::device_is_ready(dev))
+    {
+        MYLOG(" Temperature Sensor Device not ready");
+    }
+    else
+    {
+        MYLOG(" Temperature Sensor Initialized");
+    }
+}
 
 const char* temperatureSensor::get_id() const
 {
