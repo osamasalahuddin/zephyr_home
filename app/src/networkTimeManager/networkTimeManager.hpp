@@ -142,7 +142,7 @@ class networkTimeManager : public iManager
     atomic_t                   synced;               /**< Flag indicating if time is synced */
     atomic_t                   synced_time;          /**< Last synced time in milliseconds */
     atomic_t                   last_uptime;          /**< Last uptime when time was synced */
-    bool                       m_initialized{false}; /**< Initialization state flag */
+    atomic_t                   m_initialized;        /**< Initialization state flag */
 
     /**
      * @brief Time between sync attempts in milliseconds.
