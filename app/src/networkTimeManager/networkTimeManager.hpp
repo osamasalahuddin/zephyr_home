@@ -131,18 +131,18 @@ class networkTimeManager : public iManager
 
   private:
     /* Internal Variables */
-    static struct k_mutex      instance_mutex;       /**< Mutex for singleton instance protection */
-    static networkTimeManager* instance;             /**< Singleton instance */
-    struct k_mutex             state_mutex;          /**< Mutex for state protection */
-    struct k_mutex             time_mutex;           /**< Mutex for time data protection */
-    atomic_t                   sync_attempts;        /**< Counter for sync attempts */
-    atomic_t                   last_sync_error;      /**< Last sync error code */
-    atomic_t                   is_syncing;           /**< Flag indicating sync in progress */
-    atomic_t                   is_sync_active;       /**< Flag indicating sync is active */
-    atomic_t                   synced;               /**< Flag indicating if time is synced */
-    atomic_t                   synced_time;          /**< Last synced time in milliseconds */
-    atomic_t                   last_uptime;          /**< Last uptime when time was synced */
-    atomic_t                   m_initialized;        /**< Initialization state flag */
+    static struct k_mutex      instance_mutex;  /**< Mutex for singleton instance protection */
+    static networkTimeManager* instance;        /**< Singleton instance */
+    struct k_mutex             state_mutex;     /**< Mutex for state protection */
+    struct k_mutex             time_mutex;      /**< Mutex for time data protection */
+    atomic_t                   sync_attempts;   /**< Counter for sync attempts */
+    atomic_t                   last_sync_error; /**< Last sync error code */
+    atomic_t                   is_syncing;      /**< Flag indicating sync in progress */
+    atomic_t                   is_sync_active;  /**< Flag indicating sync is active */
+    atomic_t                   synced;          /**< Flag indicating if time is synced */
+    atomic_t                   synced_time;     /**< Last synced time in milliseconds */
+    atomic_t                   last_uptime;     /**< Last uptime when time was synced */
+    atomic_t                   m_initialized;   /**< Initialization state flag */
 
     /**
      * @brief Time between sync attempts in milliseconds.

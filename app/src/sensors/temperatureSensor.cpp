@@ -25,7 +25,7 @@ temperatureSensor::temperatureSensor()
 {
     // Initialize the sensor
     const struct device* dev;
-    dev = DEVICE_DT_GET(DT_NODELABEL(temperature_sensor));
+    // dev = DEVICE_DT_GET(DT_NODELABEL(temperature_sensor));
 
     if (NULL == dev)
     {

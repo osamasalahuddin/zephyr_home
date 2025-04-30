@@ -13,7 +13,8 @@
 
 LOG_MODULE_REGISTER(AHT20, CONFIG_AHT20_LOG_LEVEL); /* Register the module for log */
 
-static const struct i2c_dt_spec aht20_spec = I2C_DT_SPEC_GET(DT_NODELABEL(temperature_sensor)); /* AHT20 i2c spec */
+// static const struct i2c_dt_spec aht20_spec = I2C_DT_SPEC_GET(DT_NODELABEL(temperature_sensor)); /* AHT20 i2c spec */
+static const struct i2c_dt_spec aht20_spec;
 
 static bool isInitialized = false; /* Is the sensor initialized? */
 

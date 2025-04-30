@@ -1,12 +1,21 @@
 {
     "folders": [
         {
+            "name": "ZephyrHome",
             "path": ".",
+            "exclude": [
+                "./twister*/**",
+                "./twister-out/",
+            ]
         },
         {
             "name": "ZephyrAPIs",
-            "path": "../zephyr/include",
+            "path": "../zephyr/",
         },
+        // {
+        //     "name": "ZephyrAPIs",
+        //     "path": "../zephyr/include",
+        // },
     ],
     "settings": {
         "cmake.buildArgs": [
@@ -24,7 +33,75 @@
             "blink.h": "c",
             "cstddef": "cpp",
             "limits": "cpp",
-            "typeinfo": "cpp"
+            "typeinfo": "cpp",
+            "array": "cpp",
+            "atomic": "cpp",
+            "bit": "cpp",
+            "*.tcc": "cpp",
+            "bitset": "cpp",
+            "cctype": "cpp",
+            "clocale": "cpp",
+            "cmath": "cpp",
+            "compare": "cpp",
+            "concepts": "cpp",
+            "cstdarg": "cpp",
+            "cstdint": "cpp",
+            "cstdio": "cpp",
+            "cstdlib": "cpp",
+            "cstring": "cpp",
+            "ctime": "cpp",
+            "cwchar": "cpp",
+            "cwctype": "cpp",
+            "deque": "cpp",
+            "map": "cpp",
+            "string": "cpp",
+            "unordered_map": "cpp",
+            "vector": "cpp",
+            "exception": "cpp",
+            "algorithm": "cpp",
+            "functional": "cpp",
+            "iterator": "cpp",
+            "memory": "cpp",
+            "memory_resource": "cpp",
+            "numeric": "cpp",
+            "random": "cpp",
+            "regex": "cpp",
+            "string_view": "cpp",
+            "system_error": "cpp",
+            "tuple": "cpp",
+            "type_traits": "cpp",
+            "utility": "cpp",
+            "fstream": "cpp",
+            "initializer_list": "cpp",
+            "iosfwd": "cpp",
+            "iostream": "cpp",
+            "istream": "cpp",
+            "new": "cpp",
+            "numbers": "cpp",
+            "ostream": "cpp",
+            "sstream": "cpp",
+            "stdexcept": "cpp",
+            "streambuf": "cpp",
+            "cinttypes": "cpp",
+            "wifi_types.h": "c",
+            "socket": "cpp",
+            "condition_variable": "cpp",
+            "forward_list": "cpp",
+            "list": "cpp",
+            "buffer": "cpp",
+            "executor": "cpp",
+            "io_context": "cpp",
+            "netfwd": "cpp",
+            "ratio": "cpp",
+            "future": "cpp",
+            "mutex": "cpp",
+            "semaphore": "cpp",
+            "stop_token": "cpp",
+            "thread": "cpp",
+            "internet": "cpp",
+            "chrono": "cpp",
+            "ens160.h": "c",
+            "sensor.h": "c"
         },
         "cmake.additionalCompilerSearchDirs": [
             "home/osama/projects/esp/home_automation/zephyrproject/zephyr/include/"
@@ -42,14 +119,16 @@
         "C_Cpp.default.intelliSenseMode": "linux-gcc-x64",
         "C_Cpp.default.compileCommands": [
             "${workspaceFolder}/build/compile_commands.json",
-        ]
+        ],
+        "git.confirmEmptyCommits": false
     },
     "tasks": {
         "version": "2.0.0",
         "tasks": [
             {
                 "label": "Build Flash Monitor",
-                "command": "source ../.venv/bin/activate && clear && west build -b esp32_devkitc_wroom/esp32/procpu app && west flash && west espressif monitor",
+                // "command": "source ../.venv/bin/activate && clear && west build -b esp32_devkitc_wroom/esp32/procpu app && west flash && west espressif monitor",
+                "command": "source ../.venv/bin/activate && clear && west build -b esp32s3_devkitc/esp32s3/procpu app && west flash && west espressif monitor",
                 "type": "shell",
                 "args": [],
                 "problemMatcher": [
@@ -64,7 +143,8 @@
             },
             {
                 "label": "Build Flash",
-                "command": "source ../.venv/bin/activate && clear && west build -b esp32_devkitc_wroom/esp32/procpu app && west flash",
+                "command": "source ../.venv/bin/activate && clear && west build -b esp32_devkitc_wroom/esp32/procpu app && west flash --esp-device /dev/ttyUSB0",
+                // "command": "source ../.venv/bin/activate && clear && west build -b esp32s3_devkitc/esp32s3/procpu app && west flash ",
                 "type": "shell",
                 "args": [],
                 "problemMatcher": [
@@ -80,7 +160,8 @@
             },
             {
                 "label": "Build Only",
-                "command": "source ../.venv/bin/activate && clear && west build -b esp32_devkitc_wroom/esp32/procpu app",
+                // "command": "source ../.venv/bin/activate && clear && west build -b esp32_devkitc_wroom/esp32/procpu app",
+                "command": "source ../.venv/bin/activate && clear && west build -b esp32s3_devkitc/esp32s3/procpu app",
                 "type": "shell",
                 "args": [],
                 "problemMatcher": [
@@ -91,11 +172,12 @@
                 },
                 "group": {
                     "kind": "build",
+                    // "isDefault": true
                 }
             },
             {
                 "label": "Flash and Monitor",
-                "command": "source ../.venv/bin/activate && clear && west flash && west espressif monitor",
+                "command": "source ../.venv/bin/activate && clear && west flash --esp-device /dev/ttyUSB0 && west espressif monitor",
                 "type": "shell",
                 "args": [],
                 "problemMatcher": [
@@ -122,7 +204,28 @@
                 "group": {
                     "kind": "test",
                 }
-            }
+            },
+            {
+                "label": "start-openocd",
+                "type": "shell",
+                "command": "${workspaceFolder:ZephyrHome}/scripts/start_openocd.sh",
+                "isBackground": true,
+                "problemMatcher": {
+                  "pattern": [
+                    {
+                      "regexp": ".",
+                      "file": 1,
+                      "location": 2,
+                      "message": 3
+                    }
+                  ],
+                  "background": {
+                    "activeOnStart": true,
+                    "beginsPattern": "Info : Listening on port 3333 for gdb connections",
+                    "endsPattern": "Info : Listening on port 3333 for gdb connections"
+                  }
+                }
+              }
         ]
     },
     "launch":
@@ -131,17 +234,74 @@
         "configurations":
         [
             {
-                "name": "Monitor Zephyr (ESP)",
-                "type": "cppdbg",  // dummy type just to allow F5 binding
+                "name": "ESP32 JTAG Debug",
+                "type": "cppdbg",
                 "request": "launch",
-                "preLaunchTask": "Monitor Only",
-                "program": "",
-                "args": [],
+                "cwd": "${workspaceFolder:ZephyrHome}",
+                "program": "${workspaceFolder:ZephyrHome}/build/zephyr/zephyr.elf",
+                "miDebuggerPath": "/home/osama/.espressif/tools/xtensa-esp-elf-gdb/15.2_20241112/xtensa-esp-elf-gdb/bin/xtensa-esp32-elf-gdb",
+                // "miDebuggerPath": "home/osama/.espressif/tools/xtensa-esp-elf-gdb/15.2_20241112/xtensa-esp-elf-gdb/bin/xtensa-esp32-elf-gdb",
+                "miDebuggerServerAddress": "localhost:3333",
+                "setupCommands": [
+                    {
+                        "description": "Connect to OpenOCD",
+                        "text": "target extended-remote localhost:3333"
+                    },
+                    {
+                        "description": "Load symbols",
+                        "text": "file ${workspaceFolder:ZephyrHome}/build/zephyr/zephyr.elf"
+                    },
+                    {
+                        "description": "Use hardware breakpoints or keep breakpoints active even when target memory is not writable",
+                        "text": "set breakpoint always-inserted on"
+                    },
+                    {
+                        "description": "Allow breakpoints to be set before symbols are loaded or ELF is fully parsed",
+                        "text": "set breakpoint pending on"
+                    },
+                    {
+                        "description": "",
+                        "text": "set remote hardware-watchpoint-limit 2"
+                    },
+                    {
+                        "description": "Halt the target",
+                        "text": "monitor reset halt"
+                    },
+                    {
+                        "description": "",
+                        "text": "maintenance flush register-cache"
+                    },
+                    {
+                        "description": "Allow breakpoints to be set before symbols are loaded or ELF is fully parsed",
+                        "text": "thb main"
+                    }
+                ],
+                "logging": {
+                    "engineLogging": true,
+                    "trace": true,
+                    "traceResponse": true
+                },
+                // "openOcdPath": "~/.espressif/tools/openocd-esp32/v0.12.0-esp32-20241016/openocd-esp32/bin/openocd",
+                // "openOcdConfigs": [
+                //   "~/.espressif/tools/openocd-esp32/v0.12.0-esp32-20241016/openocd-esp32/share/openocd/scripts/interface/ftdi/esp32_devkitj_v1.cfg",
+                //   "~/.espressif/tools/openocd-esp32/v0.12.0-esp32-20241016/openocd-esp32/share/openocd/scripts/board/esp32-wrover.cfg"
+                // ],
+                "externalConsole": false,
                 "stopAtEntry": false,
-                "cwd": "${workspaceFolder:zephyr_home}",
-                "environment": [],
-                // "console": "integratedTerminal"
-            }
+                "preLaunchTask": "start-openocd"
+            },
+            // {
+            //     "name": "Monitor Zephyr (ESP)",
+            //     "type": "cppdbg",  // dummy type just to allow F5 binding
+            //     "request": "launch",
+            //     "preLaunchTask": "Monitor Only",
+            //     "program": "",
+            //     "args": [],
+            //     "stopAtEntry": false,
+            //     "cwd": "${workspaceFolder:zephyr_home}",
+            //     "environment": [],
+            //     // "console": "integratedTerminal"
+            // }
         ]
     }
 }

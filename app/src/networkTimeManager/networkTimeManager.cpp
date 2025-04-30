@@ -43,6 +43,7 @@ networkTimeManager::networkTimeManager() : SYNC_INTERVAL(3600000), SNTP_SERVER("
     atomic_set(&synced, false);
     atomic_set(&synced_time, 0);
     atomic_set(&last_uptime, 0);
+    atomic_set(&m_initialized, false);
 }
 
 networkTimeManager& networkTimeManager::getInstance()
@@ -76,7 +77,7 @@ const char* networkTimeManager::name() const
 
 void networkTimeManager::tick()
 {
-    sync(SNTP_SERVER.c_str(), 5000);
+    sync(SNTP_SERVER.c_str(), SYNC_TIMEOUT);
 }
 
 void networkTimeManager::cleanup()
@@ -113,6 +114,7 @@ bool networkTimeManager::perform_sync(const char* server, int timeout_ms)
 {
     struct sntp_ctx ctx = {};
     int             ret;
+    bool            retval = false;
 
     /* Initialize address structure */
     struct sockaddr_in addr = {};
@@ -130,53 +132,65 @@ bool networkTimeManager::perform_sync(const char* server, int timeout_ms)
     }
 
     /* Initialize SNTP context */
-    ret = sntp_init(&ctx, (struct sockaddr*) &addr, sizeof(struct sockaddr_in));
-    if (ret < 0)
+    if (!atomic_get(&m_initialized))
     {
-        handle_error("sntp_init", ret);
-        return false;
+        ret = sntp_init(&ctx, (struct sockaddr*) &addr, sizeof(struct sockaddr_in));
+        if (ret < 0)
+        {
+            handle_error("sntp_init", ret);
+            atomic_set(&m_initialized, false);
+        }
     }
 
-    /* Query SNTP server */
-    ret = sntp_query(&ctx, timeout_ms, &sntpTime);
-    if (ret < 0)
+    /* Only perform sync if initialized */
+    if (atomic_get(&m_initialized))
     {
-        handle_error("sntp_query", ret);
-        sntp_close(&ctx);
-        return false;
+
+        /* Query SNTP server */
+        ret = sntp_query(&ctx, timeout_ms, &sntpTime);
+        if (ret < 0)
+        {
+            MYLOG("SNTP Query failed: %d", ret);
+            /* Handle SNTP query error and cleanup resources */
+            handle_error("sntp_query", ret);
+            retval = false;
+        }
+        else
+        {
+            /* Update state with new time */
+            k_mutex_lock(&state_mutex, K_FOREVER);
+            atomic_set(&synced, true);
+            atomic_set(&last_uptime, k_uptime_get());
+
+            /* Log successful sync */
+            struct tm time_info;
+            time_t    time = sntpTime.seconds;
+            gmtime_r(&time, &time_info);
+
+            if ((time_info.tm_mon + 1 > 3) && (time_info.tm_mon + 1 < 11))
+            {
+                /* Daylight Savings Time */
+                atomic_set(&synced_time, ((((time_info.tm_hour + 2) % HOUR_PER_DAY) * SEC_PER_HOUR) +
+                                          (time_info.tm_min * SEC_PER_MIN) + time_info.tm_sec) *
+                                             MSEC_PER_SEC);
+            }
+            else
+            {
+                atomic_set(&synced_time, (((((time_info.tm_hour + 1)) % HOUR_PER_DAY) * SEC_PER_HOUR) +
+                                          (time_info.tm_min * SEC_PER_MIN) + time_info.tm_sec) *
+                                             MSEC_PER_SEC);
+            }
+
+            MYLOG("Time synced: %04d-%02d-%02d %02d:%02d:%02d", time_info.tm_year + 1900, time_info.tm_mon + 1,
+                  time_info.tm_mday, time_info.tm_hour, time_info.tm_min, time_info.tm_sec);
+
+            k_mutex_unlock(&state_mutex);
+
+            retval = true;
+        }
     }
 
-    /* Update state with new time */
-    k_mutex_lock(&state_mutex, K_FOREVER);
-    atomic_set(&synced, true);
-    atomic_set(&last_uptime, k_uptime_get());
-
-    /* Log successful sync */
-    struct tm time_info;
-    time_t    time = sntpTime.seconds;
-    gmtime_r(&time, &time_info);
-
-    if ((time_info.tm_mon + 1 > 3) && (time_info.tm_mon + 1 < 11))
-    {
-        /* Daylight Savings Time */
-        atomic_set(&synced_time, ((((time_info.tm_hour + 2) % 24) * SEC_PER_HOUR) + (time_info.tm_min * SEC_PER_MIN) +
-                                  time_info.tm_sec) *
-                                     MSEC_PER_SEC);
-    }
-    else
-    {
-        atomic_set(&synced_time, (((((time_info.tm_hour + 1)) % 24) * SEC_PER_HOUR) + (time_info.tm_min * SEC_PER_MIN) +
-                                  time_info.tm_sec) *
-                                     MSEC_PER_SEC);
-    }
-
-    MYLOG("Time synced: %04d-%02d-%02d %02d:%02d:%02d", time_info.tm_year + 1900, time_info.tm_mon + 1,
-          time_info.tm_mday, time_info.tm_hour, time_info.tm_min, time_info.tm_sec);
-
-    k_mutex_unlock(&state_mutex);
-
-    sntp_close(&ctx);
-    return true;
+    return retval;
 }
 
 bool networkTimeManager::sync(const char* server, int timeout_ms)

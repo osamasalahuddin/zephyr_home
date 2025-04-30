@@ -26,7 +26,7 @@ airQualitySensor::airQualitySensor()
 
     const struct device* dev;
 
-    dev = DEVICE_DT_GET(DT_NODELABEL(air_quality_sensor));
+    // dev = DEVICE_DT_GET(DT_NODELABEL(air_quality_sensor));
 
     dev = device_get_binding("air_quality_sensor");
     if (NULL == dev)

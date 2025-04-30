@@ -16,7 +16,7 @@
     air_quality_sensor: ens160@53 {
         compatible = "sciosense,ens160";
         reg = <0x53>;
-        status = "okay";
+        status = "disabled";
     };
 
     light_sensor: tsl2561@39 {
@@ -28,12 +28,12 @@
     temperature_sensor: aht20@38 {
         compatible = "aosong,aht20";
         reg = <0x38>;
-        status = "okay";
+        status = "disabled";
     };
 };
 
 &touch {
-    status = "okay";
+    status = "disabled";
 
     touch_sensor_set: touch_sensor_0 {
         channel-num = <9>;

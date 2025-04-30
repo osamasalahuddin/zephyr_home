@@ -30,7 +30,7 @@ networkManager& networkManager::getInstance()
  * @brief Constructor for the networkManager class.
  */
 networkManager::networkManager()
-    : WIFI_START_DELAY(1500U), WIFI_CONNECT_TIMEOUT(120000U), CONFIG_MY_LOCAL(MY_LOCAL), CONFIG_MY_REMOTE(MY_REMOTE),
+    : WIFI_START_DELAY(1500U), WIFI_CONNECT_TIMEOUT(60000U), CONFIG_MY_LOCAL(MY_LOCAL), CONFIG_MY_REMOTE(MY_REMOTE),
       wifi(wifiManager::getInstance()), ping(pingManager::getInstance())
 {
     k_mutex_init(&state_mutex);

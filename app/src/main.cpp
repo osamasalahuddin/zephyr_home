@@ -88,14 +88,14 @@ int main(void)
     sensorMgr.add_sensor(&airQualitySensor, &socketAirQualitySensor);
     sensorMgr.add_sensor(&temperatureSensor, &socketTempSensor);
 
-    socketLightSensor.open(networkManager::getInstance().getLocalServer(), portConfig::PORT_AIR_QUALITY_SENSOR,
-                           socketManager::protocol::UDP);
+    // socketLightSensor.open(networkManager::getInstance().getLocalServer(), portConfig::PORT_AIR_QUALITY_SENSOR,
+    //                        socketManager::protocol::UDP);
 
-    socketLightSensor.open(networkManager::getInstance().getLocalServer(), portConfig::PORT_LIGHT_SENSOR,
-                           socketManager::protocol::UDP);
+    // socketLightSensor.open(networkManager::getInstance().getLocalServer(), portConfig::PORT_LIGHT_SENSOR,
+    //                        socketManager::protocol::UDP);
 
-    socketLightSensor.open(networkManager::getInstance().getLocalServer(), portConfig::PORT_TEMP_SENSOR,
-                           socketManager::protocol::UDP);
+    // socketLightSensor.open(networkManager::getInstance().getLocalServer(), portConfig::PORT_TEMP_SENSOR,
+    //                        socketManager::protocol::UDP);
 
     bool isSocket =
         socketTempSensor.open(network.getLocalServer(), portConfig::PORT_TEMP_SENSOR, socketManager::protocol::UDP);
